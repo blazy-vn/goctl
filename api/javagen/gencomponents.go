@@ -11,10 +11,10 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/spec"
-	apiutil "github.com/blazy-vn/go-zero/tools/goctl/api/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/api/spec"
+	apiutil "github.com/blazy-vn/goctl/api/util"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/zeromicro/go-zero/core/stringx"
 )
 

@@ -3,7 +3,7 @@ package tsgen
 import (
 	"testing"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/spec"
+	"github.com/blazy-vn/goctl/api/spec"
 	"github.com/stretchr/testify/assert"
 )
 

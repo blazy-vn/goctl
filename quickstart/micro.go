@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
 )

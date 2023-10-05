@@ -5,7 +5,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/spec"
+	"github.com/blazy-vn/goctl/api/spec"
 )
 
 const apiTemplate = `import 'api.dart';

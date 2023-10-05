@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/parser"
+	"github.com/blazy-vn/goctl/api/parser"
 	"github.com/spf13/cobra"
 	"github.com/zeromicro/go-zero/core/logx"
 )

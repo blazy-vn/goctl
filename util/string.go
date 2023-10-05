@@ -3,7 +3,7 @@ package util
 import (
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util/console"
+	"github.com/blazy-vn/goctl/util/console"
 )
 
 var goKeyword = map[string]string{

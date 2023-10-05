@@ -10,9 +10,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/config"
-	"github.com/blazy-vn/go-zero/tools/goctl/model/sql/gen"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/model/sql/gen"
+	"github.com/blazy-vn/goctl/util/pathx"
 )
 
 var (

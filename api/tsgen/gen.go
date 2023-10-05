@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/parser"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/api/parser"
+	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"github.com/zeromicro/go-zero/core/logx"

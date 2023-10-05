@@ -3,7 +3,7 @@ package cobrax
 import (
 	"fmt"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/internal/flags"
+	"github.com/blazy-vn/goctl/internal/flags"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

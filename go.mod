@@ -1,4 +1,4 @@
-module github.com/blazy-vn/go-zero/tools/goctl
+module github.com/blazy-vn/goctl
 
 go 1.18
 

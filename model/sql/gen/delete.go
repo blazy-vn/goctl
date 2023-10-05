@@ -4,10 +4,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/model/sql/template"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/stringx"
+	"github.com/blazy-vn/goctl/model/sql/template"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/util/stringx"
 	"github.com/zeromicro/go-zero/core/collection"
 )
 

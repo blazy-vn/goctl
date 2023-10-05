@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/update/config"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/update/config"
+	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/hash"
 	"github.com/zeromicro/go-zero/core/logx"

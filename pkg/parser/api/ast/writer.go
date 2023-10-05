@@ -7,8 +7,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/token"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
+	"github.com/blazy-vn/goctl/pkg/parser/api/token"
+	"github.com/blazy-vn/goctl/util"
 )
 
 const (

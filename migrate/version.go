@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util/console"
+	"github.com/blazy-vn/goctl/util/console"
 )
 
 var client = http.Client{

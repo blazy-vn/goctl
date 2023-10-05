@@ -3,7 +3,7 @@ package util
 import (
 	"testing"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/test"
+	"github.com/blazy-vn/goctl/test"
 )
 
 func TestIsTemplate(t *testing.T) {

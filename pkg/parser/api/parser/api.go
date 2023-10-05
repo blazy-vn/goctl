@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/ast"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/placeholder"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/token"
+	"github.com/blazy-vn/goctl/pkg/parser/api/ast"
+	"github.com/blazy-vn/goctl/pkg/parser/api/placeholder"
+	"github.com/blazy-vn/goctl/pkg/parser/api/token"
 )
 
 // API is the parsed api file.

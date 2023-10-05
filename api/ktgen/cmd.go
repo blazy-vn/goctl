@@ -3,7 +3,7 @@ package ktgen
 import (
 	"errors"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/parser"
+	"github.com/blazy-vn/goctl/api/parser"
 	"github.com/spf13/cobra"
 )
 

@@ -6,7 +6,7 @@ package client
 import (
 	"context"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/example/rpc/hello/pb/hello"
+	"github.com/blazy-vn/goctl/example/rpc/hello/pb/hello"
 
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"

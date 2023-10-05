@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/spec"
-	"github.com/blazy-vn/go-zero/tools/goctl/config"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/format"
-	"github.com/blazy-vn/go-zero/tools/goctl/vars"
+	"github.com/blazy-vn/goctl/api/spec"
+	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/util/format"
+	"github.com/blazy-vn/goctl/vars"
 )
 
 const (

@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/model/sql/parser"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/stringx"
+	"github.com/blazy-vn/goctl/model/sql/parser"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/stringx"
 )
 
 // Key describes cache key

@@ -6,11 +6,11 @@ import (
 	"path"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/spec"
-	"github.com/blazy-vn/go-zero/tools/goctl/config"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/format"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/api/spec"
+	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/format"
+	"github.com/blazy-vn/goctl/util/pathx"
 )
 
 const defaultLogicPackage = "logic"

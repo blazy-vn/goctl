@@ -1,9 +1,9 @@
 package rpc
 
 import (
-	"github.com/blazy-vn/go-zero/tools/goctl/config"
-	"github.com/blazy-vn/go-zero/tools/goctl/internal/cobrax"
-	"github.com/blazy-vn/go-zero/tools/goctl/rpc/cli"
+	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/internal/cobrax"
+	"github.com/blazy-vn/goctl/rpc/cli"
 	"github.com/spf13/cobra"
 )
 

@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/rpc/generator"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/rpc/generator"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/spf13/cobra"
 )
 

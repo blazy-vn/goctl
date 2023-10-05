@@ -3,10 +3,10 @@ package generator
 import (
 	"path/filepath"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/rpc/parser"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/console"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/ctx"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/rpc/parser"
+	"github.com/blazy-vn/goctl/util/console"
+	"github.com/blazy-vn/goctl/util/ctx"
+	"github.com/blazy-vn/goctl/util/pathx"
 )
 
 type ZRpcContext struct {

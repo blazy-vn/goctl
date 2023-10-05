@@ -1,6 +1,6 @@
 package env
 
-import "github.com/blazy-vn/go-zero/tools/goctl/internal/cobrax"
+import "github.com/blazy-vn/goctl/internal/cobrax"
 
 var (
 	sliceVarWriteValue []string

@@ -1,19 +1,19 @@
 package api
 
 import (
-	"github.com/blazy-vn/go-zero/tools/goctl/api/apigen"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/dartgen"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/docgen"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/format"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/gogen"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/javagen"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/ktgen"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/new"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/tsgen"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/validate"
-	"github.com/blazy-vn/go-zero/tools/goctl/config"
-	"github.com/blazy-vn/go-zero/tools/goctl/internal/cobrax"
-	"github.com/blazy-vn/go-zero/tools/goctl/plugin"
+	"github.com/blazy-vn/goctl/api/apigen"
+	"github.com/blazy-vn/goctl/api/dartgen"
+	"github.com/blazy-vn/goctl/api/docgen"
+	"github.com/blazy-vn/goctl/api/format"
+	"github.com/blazy-vn/goctl/api/gogen"
+	"github.com/blazy-vn/goctl/api/javagen"
+	"github.com/blazy-vn/goctl/api/ktgen"
+	"github.com/blazy-vn/goctl/api/new"
+	"github.com/blazy-vn/goctl/api/tsgen"
+	"github.com/blazy-vn/goctl/api/validate"
+	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/internal/cobrax"
+	"github.com/blazy-vn/goctl/plugin"
 	"github.com/spf13/cobra"
 )
 

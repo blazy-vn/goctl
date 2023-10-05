@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/model/sql/util"
+	"github.com/blazy-vn/goctl/model/sql/util"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 

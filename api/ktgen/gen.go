@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/spec"
+	"github.com/blazy-vn/goctl/api/spec"
 	"github.com/iancoleman/strcase"
 )
 

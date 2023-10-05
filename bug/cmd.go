@@ -1,7 +1,7 @@
 package bug
 
 import (
-	"github.com/blazy-vn/go-zero/tools/goctl/internal/cobrax"
+	"github.com/blazy-vn/goctl/internal/cobrax"
 	"github.com/spf13/cobra"
 )
 

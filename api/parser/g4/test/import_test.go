@@ -4,8 +4,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/parser/g4/ast"
-	"github.com/blazy-vn/go-zero/tools/goctl/api/parser/g4/gen/api"
+	"github.com/blazy-vn/goctl/api/parser/g4/ast"
+	"github.com/blazy-vn/goctl/api/parser/g4/gen/api"
 	"github.com/stretchr/testify/assert"
 )
 

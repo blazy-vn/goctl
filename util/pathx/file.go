@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/internal/version"
+	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/gookit/color"
 )
 

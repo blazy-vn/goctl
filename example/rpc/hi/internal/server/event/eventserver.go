@@ -6,9 +6,9 @@ package server
 import (
 	"context"
 
-	eventlogic "github.com/blazy-vn/go-zero/tools/goctl/example/rpc/hi/internal/logic/event"
-	"github.com/blazy-vn/go-zero/tools/goctl/example/rpc/hi/internal/svc"
-	"github.com/blazy-vn/go-zero/tools/goctl/example/rpc/hi/pb/hi"
+	eventlogic "github.com/blazy-vn/goctl/example/rpc/hi/internal/logic/event"
+	"github.com/blazy-vn/goctl/example/rpc/hi/internal/svc"
+	"github.com/blazy-vn/goctl/example/rpc/hi/pb/hi"
 )
 
 type EventServer struct {

@@ -6,9 +6,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/spec"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/api/spec"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/pathx"
 )
 
 func writeProperty(writer io.Writer, member spec.Member, indent int) error {

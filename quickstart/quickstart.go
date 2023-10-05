@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util/console"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/ctx"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/util/console"
+	"github.com/blazy-vn/goctl/util/ctx"
+	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/spf13/cobra"
 	"github.com/zeromicro/go-zero/core/logx"
 )

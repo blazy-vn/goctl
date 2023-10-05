@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/internal/version"
+	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/stretchr/testify/assert"
 )
 

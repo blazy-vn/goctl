@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/ast"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/scanner"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/token"
+	"github.com/blazy-vn/goctl/pkg/parser/api/ast"
+	"github.com/blazy-vn/goctl/pkg/parser/api/scanner"
+	"github.com/blazy-vn/goctl/pkg/parser/api/token"
 )
 
 const idAPI = "api"

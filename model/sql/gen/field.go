@@ -3,10 +3,10 @@ package gen
 import (
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/model/sql/parser"
-	"github.com/blazy-vn/go-zero/tools/goctl/model/sql/template"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/model/sql/parser"
+	"github.com/blazy-vn/goctl/model/sql/template"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/pathx"
 )
 
 func genFields(table Table, fields []*parser.Field) (string, error) {

@@ -3,8 +3,8 @@ package generate
 import (
 	"fmt"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/model/mongo/template"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/model/mongo/template"
+	"github.com/blazy-vn/goctl/util/pathx"
 )
 
 const (

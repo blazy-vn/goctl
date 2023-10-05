@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
+	"github.com/blazy-vn/goctl/util"
 )
 
 //go:embed default_en.json

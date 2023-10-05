@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/parser/g4/gen/api"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/console"
+	"github.com/blazy-vn/goctl/api/parser/g4/gen/api"
+	"github.com/blazy-vn/goctl/util/console"
 	"github.com/zeromicro/antlr"
 )
 

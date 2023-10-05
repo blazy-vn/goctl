@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
+	"github.com/blazy-vn/goctl/util"
 )
 
 // Vars defines a template for var block in model

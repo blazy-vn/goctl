@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util/stringx"
+	"github.com/blazy-vn/goctl/util/stringx"
 )
 
 var (

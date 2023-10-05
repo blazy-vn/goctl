@@ -3,7 +3,7 @@ package env
 import (
 	"fmt"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/env"
+	"github.com/blazy-vn/goctl/pkg/env"
 	"github.com/spf13/cobra"
 )
 

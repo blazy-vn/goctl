@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util/console"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/ctx"
+	"github.com/blazy-vn/goctl/util/console"
+	"github.com/blazy-vn/goctl/util/ctx"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 )

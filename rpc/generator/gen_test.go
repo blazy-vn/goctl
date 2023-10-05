@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/rpc/execx"
+	"github.com/blazy-vn/goctl/rpc/execx"
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stringx"

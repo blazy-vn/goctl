@@ -7,9 +7,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/spec"
-	apiutil "github.com/blazy-vn/go-zero/tools/goctl/api/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
+	"github.com/blazy-vn/goctl/api/spec"
+	apiutil "github.com/blazy-vn/goctl/api/util"
+	"github.com/blazy-vn/goctl/util"
 	"github.com/zeromicro/go-zero/core/stringx"
 )
 

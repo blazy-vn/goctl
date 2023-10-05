@@ -4,10 +4,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/goctl"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/golang"
-	"github.com/blazy-vn/go-zero/tools/goctl/rpc/execx"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/env"
+	"github.com/blazy-vn/goctl/pkg/goctl"
+	"github.com/blazy-vn/goctl/pkg/golang"
+	"github.com/blazy-vn/goctl/rpc/execx"
+	"github.com/blazy-vn/goctl/util/env"
 )
 
 const (

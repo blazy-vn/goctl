@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/internal/version"
+	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/spf13/cobra"
 )
 

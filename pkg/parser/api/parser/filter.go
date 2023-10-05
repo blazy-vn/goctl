@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/ast"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/placeholder"
+	"github.com/blazy-vn/goctl/pkg/parser/api/ast"
+	"github.com/blazy-vn/goctl/pkg/parser/api/placeholder"
 )
 
 type filterBuilder struct {

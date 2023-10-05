@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/spec"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/ast"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/placeholder"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/token"
+	"github.com/blazy-vn/goctl/api/spec"
+	"github.com/blazy-vn/goctl/pkg/parser/api/ast"
+	"github.com/blazy-vn/goctl/pkg/parser/api/placeholder"
+	"github.com/blazy-vn/goctl/pkg/parser/api/token"
 )
 
 // Analyzer analyzes the ast and converts it to spec.

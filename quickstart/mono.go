@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/gogen"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/golang"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/api/gogen"
+	"github.com/blazy-vn/goctl/pkg/golang"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 

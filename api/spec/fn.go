@@ -5,7 +5,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
+	"github.com/blazy-vn/goctl/util"
 	"github.com/zeromicro/go-zero/core/stringx"
 )
 

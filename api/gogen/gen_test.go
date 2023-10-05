@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/parser"
-	"github.com/blazy-vn/go-zero/tools/goctl/rpc/execx"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/api/parser"
+	"github.com/blazy-vn/goctl/rpc/execx"
+	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util/console"
+	"github.com/blazy-vn/goctl/util/console"
 	"github.com/zeromicro/go-zero/core/syncx"
 )
 

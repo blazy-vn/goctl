@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/blazy-vn/go-zero/tools/goctl/cmd"
+	"github.com/blazy-vn/goctl/cmd"
 	"github.com/zeromicro/go-zero/core/load"
 	"github.com/zeromicro/go-zero/core/logx"
 )

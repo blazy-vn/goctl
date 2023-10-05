@@ -9,9 +9,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/env"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/env"
+	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 )

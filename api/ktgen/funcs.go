@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/util"
+	"github.com/blazy-vn/goctl/api/util"
 	"github.com/iancoleman/strcase"
 )
 

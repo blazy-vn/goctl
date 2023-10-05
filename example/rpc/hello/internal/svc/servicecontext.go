@@ -1,6 +1,6 @@
 package svc
 
-import "github.com/blazy-vn/go-zero/tools/goctl/example/rpc/hello/internal/config"
+import "github.com/blazy-vn/goctl/example/rpc/hello/internal/config"
 
 type ServiceContext struct {
 	Config config.Config

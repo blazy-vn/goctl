@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/assertx"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/token"
+	"github.com/blazy-vn/goctl/pkg/parser/api/assertx"
+	"github.com/blazy-vn/goctl/pkg/parser/api/token"
 	"github.com/stretchr/testify/assert"
 )
 

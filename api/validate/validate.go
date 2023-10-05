@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/api/parser"
+	"github.com/blazy-vn/goctl/api/parser"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 )

@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	conf "github.com/blazy-vn/go-zero/tools/goctl/config"
-	"github.com/blazy-vn/go-zero/tools/goctl/rpc/parser"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/format"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/stringx"
+	conf "github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/rpc/parser"
+	"github.com/blazy-vn/goctl/util"
+	"github.com/blazy-vn/goctl/util/format"
+	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/util/stringx"
 )
 
 //go:embed etc.tpl

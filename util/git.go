@@ -8,8 +8,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/util/env"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/util/env"
+	"github.com/blazy-vn/goctl/util/pathx"
 )
 
 func CloneIntoGitHome(url, branch string) (dir string, err error) {

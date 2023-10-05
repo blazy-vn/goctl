@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/token"
+	"github.com/blazy-vn/goctl/pkg/parser/api/token"
 )
 
 const (

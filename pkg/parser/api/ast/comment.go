@@ -3,8 +3,8 @@ package ast
 import (
 	"strings"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/parser/api/token"
-	"github.com/blazy-vn/go-zero/tools/goctl/util"
+	"github.com/blazy-vn/goctl/pkg/parser/api/token"
+	"github.com/blazy-vn/goctl/util"
 )
 
 // CommentGroup represents a list of comments.

@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/env"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/protoc"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/protocgengo"
-	"github.com/blazy-vn/go-zero/tools/goctl/pkg/protocgengogrpc"
-	"github.com/blazy-vn/go-zero/tools/goctl/util/console"
+	"github.com/blazy-vn/goctl/pkg/env"
+	"github.com/blazy-vn/goctl/pkg/protoc"
+	"github.com/blazy-vn/goctl/pkg/protocgengo"
+	"github.com/blazy-vn/goctl/pkg/protocgengogrpc"
+	"github.com/blazy-vn/goctl/util/console"
 	"github.com/spf13/cobra"
 )
 
