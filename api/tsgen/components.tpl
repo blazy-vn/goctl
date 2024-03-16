@@ -2,7 +2,7 @@
 export interface GenericResponse<T> {
     code: number
     message: string
-    data: T
+    data: T | null
 }
 
 {{.componentTypes}}
