@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/blazy-vn/goctl/api/parser"
+	"github.com/blazy-vn/goctl/pkg/env"
 	"github.com/blazy-vn/goctl/rpc/execx"
 	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/stretchr/testify/assert"
@@ -53,7 +54,10 @@ func TestParser(t *testing.T) {
 	filename := "greet.api"
 	err := os.WriteFile(filename, []byte(testApiTemplate), os.ModePerm)
 	assert.Nil(t, err)
-	defer os.Remove(filename)
+	env.Set(t, env.GoctlExperimental, "off")
+	t.Cleanup(func() {
+		os.Remove(filename)
+	})
 
 	api, err := parser.Parse(filename)
 	assert.Nil(t, err)

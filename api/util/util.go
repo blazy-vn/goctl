@@ -62,9 +62,9 @@ func Copy(src, dst string) (int64, error) {
 func ComponentName(api *spec.ApiSpec) string {
 	name := api.Service.Name
 	if strings.HasSuffix(name, "-api") {
-		return name[:len(name)-4] + "-types"
+		return name[:len(name)-4] + "Components"
 	}
-	return name + "-types"
+	return name + "Components"
 }
 
 // WriteIndent writes tab spaces

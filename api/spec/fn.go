@@ -141,9 +141,9 @@ func (m Member) IsFormMember() bool {
 
 // IsTagMember returns true if contains given tag
 func (m Member) IsTagMember(tagKey string) bool {
-	//if m.IsInline {
-	//	return true
-	//}
+	if m.IsInline {
+		return true
+	}
 
 	tags := m.Tags()
 	for _, tag := range tags {
