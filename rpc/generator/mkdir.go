@@ -1,15 +1,15 @@
 package generator
 
 import (
-	"github.com/zeromicro/go-zero/tools/goctl/util/format"
+	"github.com/blazy-vn/goctl/util/format"
 	"path/filepath"
 	"strings"
 
-	conf "github.com/zeromicro/go-zero/tools/goctl/config"
-	"github.com/zeromicro/go-zero/tools/goctl/rpc/parser"
-	"github.com/zeromicro/go-zero/tools/goctl/util/ctx"
-	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
-	"github.com/zeromicro/go-zero/tools/goctl/util/stringx"
+	conf "github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/rpc/parser"
+	"github.com/blazy-vn/goctl/util/ctx"
+	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/util/stringx"
 )
 
 const (

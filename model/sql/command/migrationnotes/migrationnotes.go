@@ -1,8 +1,8 @@
 package migrationnotes
 
 import (
-	"github.com/zeromicro/go-zero/tools/goctl/config"
-	"github.com/zeromicro/go-zero/tools/goctl/util/format"
+	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/util/format"
 )
 
 // BeforeCommands run before comamnd run to show some migration notes

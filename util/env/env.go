@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zeromicro/go-zero/tools/goctl/vars"
+	"github.com/blazy-vn/goctl/vars"
 )
 
 const (
