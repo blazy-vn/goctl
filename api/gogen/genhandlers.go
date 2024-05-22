@@ -151,15 +151,17 @@ func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
 	}
 
 	authName = strings.TrimSuffix(authName, "s")
-	authName = strings.Title(authName)
 
 	authPkg := fmt.Sprintf("%s/auth", rootPkg)
 	authFilename := fmt.Sprintf("%s.go", authName)
 
+	pkgParts := strings.Split(rootPkg, "/")
+	moduleName := pkgParts[0]
+
 	authImports := fmt.Sprintf(`"%s/common/bauth"
 	"%s/ent"
 	"context"
-	"github.com/zeromicro/go-zero/core/logx"`, rootPkg, rootPkg)
+	"github.com/zeromicro/go-zero/core/logx"`, moduleName, moduleName)
 
 	authMethods := make([]string, 0)
 	for _, route := range group.Routes {
@@ -229,7 +231,7 @@ func genAuthImplements(authName string, authActions []string) string {
 		return false
 	}
 	return can
-}`, authName, strings.Title(action), authName, strings.ToLower(authName), action, strings.ToLower(authName), action)
+}`, authName, strings.Title(action), authName, strings.ToLower(authName), action, strings.ToLower(authName), strings.ToLower(action))
 		implements = append(implements, implement)
 	}
 	return strings.Join(implements, "\n\n")
