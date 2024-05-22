@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/goctl/rpc/generator"
-	"github.com/blazy-vn/goctl/util"
-	"github.com/blazy-vn/goctl/util/console"
-	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/spf13/cobra"
+	"github.com/zeromicro/go-zero/tools/goctl/rpc/generator"
+	"github.com/zeromicro/go-zero/tools/goctl/util"
+	"github.com/zeromicro/go-zero/tools/goctl/util/console"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 var (

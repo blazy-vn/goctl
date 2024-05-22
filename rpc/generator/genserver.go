@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	conf "github.com/blazy-vn/goctl/config"
-	"github.com/blazy-vn/goctl/rpc/parser"
-	"github.com/blazy-vn/goctl/util"
-	"github.com/blazy-vn/goctl/util/format"
-	"github.com/blazy-vn/goctl/util/pathx"
-	"github.com/blazy-vn/goctl/util/stringx"
 	"github.com/zeromicro/go-zero/core/collection"
+	conf "github.com/zeromicro/go-zero/tools/goctl/config"
+	"github.com/zeromicro/go-zero/tools/goctl/rpc/parser"
+	"github.com/zeromicro/go-zero/tools/goctl/util"
+	"github.com/zeromicro/go-zero/tools/goctl/util/format"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
+	"github.com/zeromicro/go-zero/tools/goctl/util/stringx"
 )
 
 const functionTemplate = `
@@ -92,7 +92,7 @@ func (g *Generator) genServerGroup(ctx DirContext, proto parser.Proto, cfg *conf
 		if err = util.With("server").GoFmt(true).Parse(text).SaveTo(map[string]any{
 			"head": head,
 			"unimplementedServer": fmt.Sprintf("%s.Unimplemented%sServer", proto.PbPackage,
-				stringx.From(service.Name).ToCamel()),
+				parser.CamelCase(service.Name)),
 			"server":    stringx.From(service.Name).ToCamel(),
 			"imports":   strings.Join(imports.KeysStr(), pathx.NL),
 			"funcs":     strings.Join(funcList, pathx.NL),
@@ -143,7 +143,7 @@ func (g *Generator) genServerInCompatibility(ctx DirContext, proto parser.Proto,
 	return util.With("server").GoFmt(true).Parse(text).SaveTo(map[string]any{
 		"head": head,
 		"unimplementedServer": fmt.Sprintf("%s.Unimplemented%sServer", proto.PbPackage,
-			stringx.From(service.Name).ToCamel()),
+			parser.CamelCase(service.Name)),
 		"server":    stringx.From(service.Name).ToCamel(),
 		"imports":   strings.Join(imports.KeysStr(), pathx.NL),
 		"funcs":     strings.Join(funcList, pathx.NL),

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/blazy-vn/goctl/plugin"
+	"github.com/zeromicro/go-zero/tools/goctl/plugin"
 )
 
 func main() {

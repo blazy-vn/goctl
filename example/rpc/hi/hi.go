@@ -4,11 +4,11 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/blazy-vn/goctl/example/rpc/hi/internal/config"
-	eventServer "github.com/blazy-vn/goctl/example/rpc/hi/internal/server/event"
-	greetServer "github.com/blazy-vn/goctl/example/rpc/hi/internal/server/greet"
-	"github.com/blazy-vn/goctl/example/rpc/hi/internal/svc"
-	"github.com/blazy-vn/goctl/example/rpc/hi/pb/hi"
+	"github.com/zeromicro/go-zero/tools/goctl/example/rpc/hi/internal/config"
+	eventServer "github.com/zeromicro/go-zero/tools/goctl/example/rpc/hi/internal/server/event"
+	greetServer "github.com/zeromicro/go-zero/tools/goctl/example/rpc/hi/internal/server/greet"
+	"github.com/zeromicro/go-zero/tools/goctl/example/rpc/hi/internal/svc"
+	"github.com/zeromicro/go-zero/tools/goctl/example/rpc/hi/pb/hi"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"

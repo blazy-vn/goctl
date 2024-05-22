@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/goctl/config"
-	"github.com/blazy-vn/goctl/model/mongo/generate"
-	file "github.com/blazy-vn/goctl/util"
-	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/spf13/cobra"
+	"github.com/zeromicro/go-zero/tools/goctl/config"
+	"github.com/zeromicro/go-zero/tools/goctl/model/mongo/generate"
+	file "github.com/zeromicro/go-zero/tools/goctl/util"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 var (

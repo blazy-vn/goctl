@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/gookit/color"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 type (

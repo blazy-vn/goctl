@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/blazy-vn/goctl/pkg/parser/api/ast"
-	"github.com/blazy-vn/goctl/pkg/parser/api/scanner"
-	"github.com/blazy-vn/goctl/pkg/parser/api/token"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/ast"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/scanner"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
 )
 
 const (
@@ -1239,6 +1239,34 @@ func (p *Parser) parseAtServerKVExpression() *ast.KVExpr {
 					idTok := p.curTok
 					valueTok = token.Token{
 						Text:     valueTok.Text + slashTok.Text + idTok.Text,
+						Position: valueTok.Position,
+					}
+					leadingCommentGroup = p.curTokenNode().LeadingCommentGroup
+				} else {
+					break
+				}
+			}
+
+			valueTok.Type = token.PATH
+			node := ast.NewTokenNode(valueTok)
+			node.SetLeadingCommentGroup(leadingCommentGroup)
+			expr.Value = node
+			return expr
+		} else if p.peekTokenIs(token.SUB) {
+			for {
+				if p.peekTokenIs(token.SUB) {
+					if !p.nextToken() {
+						return nil
+					}
+
+					subTok := p.curTok
+					if !p.advanceIfPeekTokenIs(token.IDENT) {
+						return nil
+					}
+
+					idTok := p.curTok
+					valueTok = token.Token{
+						Text:     valueTok.Text + subTok.Text + idTok.Text,
 						Position: valueTok.Position,
 					}
 					leadingCommentGroup = p.curTokenNode().LeadingCommentGroup

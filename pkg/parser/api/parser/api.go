@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/goctl/pkg/parser/api/ast"
-	"github.com/blazy-vn/goctl/pkg/parser/api/importstack"
-	"github.com/blazy-vn/goctl/pkg/parser/api/placeholder"
-	"github.com/blazy-vn/goctl/pkg/parser/api/token"
 	"github.com/zeromicro/go-zero/core/lang"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/ast"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/importstack"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/placeholder"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
 )
 
 const (
@@ -32,11 +32,8 @@ type API struct {
 func convert2API(a *ast.AST, importSet map[string]lang.PlaceholderType, is *importstack.ImportStack) (*API, error) {
 	var api = new(API)
 	api.importManager = is
-	api.importSet = make(map[string]lang.PlaceholderType)
+	api.importSet = importSet
 	api.Filename = a.Filename
-	for k, v := range importSet {
-		api.importSet[k] = v
-	}
 	one := a.Stmts[0]
 	syntax, ok := one.(*ast.SyntaxStmt)
 	if !ok {

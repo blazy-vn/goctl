@@ -7,12 +7,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/blazy-vn/goctl/api/parser/g4/gen/api"
-	"github.com/blazy-vn/goctl/api/spec"
-	"github.com/blazy-vn/goctl/config"
-	"github.com/blazy-vn/goctl/util/format"
-	"github.com/blazy-vn/goctl/util/pathx"
-	"github.com/blazy-vn/goctl/vars"
+	"github.com/zeromicro/go-zero/tools/goctl/api/parser/g4/gen/api"
+	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
+	"github.com/zeromicro/go-zero/tools/goctl/config"
+	"github.com/zeromicro/go-zero/tools/goctl/util/format"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
+	"github.com/zeromicro/go-zero/tools/goctl/vars"
 )
 
 //go:embed logic.tpl
@@ -62,7 +62,7 @@ func genLogicByRoute(dir, rootPkg string, cfg *config.Config, group spec.Group, 
 		category:        category,
 		templateFile:    logicTemplateFile,
 		builtinTemplate: logicTemplate,
-		data: map[string]string{
+		data: map[string]any{
 			"pkgName":      subDir[strings.LastIndex(subDir, "/")+1:],
 			"imports":      imports,
 			"logic":        strings.Title(logic),
@@ -70,6 +70,8 @@ func genLogicByRoute(dir, rootPkg string, cfg *config.Config, group spec.Group, 
 			"responseType": responseString,
 			"returnString": returnString,
 			"request":      requestString,
+			"hasDoc":       len(route.JoinedDoc()) > 0,
+			"doc":          getDoc(route.JoinedDoc()),
 		},
 	})
 }

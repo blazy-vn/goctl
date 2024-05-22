@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blazy-vn/goctl/pkg/parser/api/assertx"
-	"github.com/blazy-vn/goctl/pkg/parser/api/ast"
-	"github.com/blazy-vn/goctl/pkg/parser/api/token"
 	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/assertx"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/ast"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
 )
 
 //go:embed testdata/comment_test.api
@@ -303,6 +303,7 @@ func TestParser_Parse_atServerStmt(t *testing.T) {
 			"prefix1:":    "/v1/v2_test/v2-beta",
 			"prefix2:":    "v1/v2_test/v2-beta",
 			"prefix3:":    "v1/v2_",
+			"prefix4:":    "a-b-c",
 			"summary:":    `"test"`,
 		}
 

@@ -1,9 +1,9 @@
 package gen
 
 import (
-	"github.com/blazy-vn/goctl/model/sql/template"
-	"github.com/blazy-vn/goctl/util"
-	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/template"
+	"github.com/zeromicro/go-zero/tools/goctl/util"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 func genTag(table Table, in string) (string, error) {
