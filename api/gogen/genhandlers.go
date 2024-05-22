@@ -75,6 +75,10 @@ func doGenToFile(dir, handler string, cfg *config.Config, group spec.Group,
 }
 
 func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
+	if err := genAuthError(authDir, rootPkg, cfg, api); err != nil {
+		return err
+	}
+
 	for _, group := range api.Service.Groups {
 		if err := genAuth(authDir, rootPkg, cfg, group); err != nil {
 			return err
@@ -235,4 +239,74 @@ func genAuthImplements(authName string, authActions []string) string {
 		implements = append(implements, implement)
 	}
 	return strings.Join(implements, "\n\n")
+}
+
+func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
+	pkgParts := strings.Split(rootPkg, "/")
+	moduleName := pkgParts[0]
+
+	errImports := fmt.Sprintf(`"%s/common/berr"`, moduleName)
+
+	var errorVars []string
+	for i, group := range api.Service.Groups {
+		authName := group.GetAnnotation(groupProperty)
+		if len(authName) == 0 {
+			continue
+		}
+
+		authName = strings.TrimSuffix(authName, "s")
+
+		authMethods := make([]string, 0)
+		for _, route := range group.Routes {
+			handler := getHandlerName(route)
+			method := strings.TrimSuffix(handler, "Handler")
+			authMethods = append(authMethods, method)
+		}
+
+		baseErrCode := getBaseErrCode(i)
+		errorVars = append(errorVars, genAuthErrorVars(authName, authMethods, baseErrCode))
+	}
+
+	authData := map[string]interface{}{
+		"ErrImports": errImports,
+		"ErrVars":    strings.Join(errorVars, "\n\n"),
+	}
+
+	return genFile(fileGenConfig{
+		dir:             dir,
+		subdir:          "auth",
+		filename:        "error.go",
+		templateName:    "authErrorTemplate",
+		category:        category,
+		templateFile:    "", // Không cần thiết khi sử dụng embed
+		builtinTemplate: authErrorTemplate,
+		data:            authData,
+	})
+}
+
+var authErrorTemplate = `package auth
+
+import (
+	{{.ErrImports}}
+)
+
+var (
+	{{.ErrVars}}
+)
+`
+
+func genAuthErrorVars(authName string, authActions []string, baseErrCode int) string {
+	var errorVars []string
+	for i, action := range authActions {
+		errCode := baseErrCode + i + 1
+		errName := fmt.Sprintf("Err%s%sDenied", authName, strings.Title(action))
+		errMsg := fmt.Sprintf("You do not have permission to perform this action: %s::%s", strings.ToLower(authName), action)
+		errorVar := fmt.Sprintf("%s = berr.NewErrCodeMsg(%d, \"%s\")", errName, errCode, errMsg)
+		errorVars = append(errorVars, errorVar)
+	}
+	return strings.Join(errorVars, "\n\t")
+}
+
+func getBaseErrCode(groupIndex int) int {
+	return 2001 + groupIndex*100
 }
