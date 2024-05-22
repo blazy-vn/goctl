@@ -76,6 +76,10 @@ func doGenToFile(dir, handler string, cfg *config.Config, group spec.Group,
 
 func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 	for _, group := range api.Service.Groups {
+		if err := genAuth(dir, rootPkg, cfg, group); err != nil {
+			return err
+		}
+
 		for _, route := range group.Routes {
 			if err := genHandler(dir, rootPkg, cfg, group, route); err != nil {
 				return err
@@ -138,4 +142,95 @@ func getLogicName(route spec.Route) string {
 	}
 
 	return handler + "Logic"
+}
+
+func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
+	authName := group.GetAnnotation(groupProperty)
+	if len(authName) == 0 {
+		return nil
+	}
+
+	authName = strings.TrimSuffix(authName, "s")
+	authName = strings.Title(authName)
+
+	authPkg := fmt.Sprintf("%s/auth", rootPkg)
+	authFilename := fmt.Sprintf("%s.go", authName)
+
+	authImports := fmt.Sprintf(`"%s/common/bauth"
+	"%s/ent"
+	"context"
+	"github.com/zeromicro/go-zero/core/logx"`, rootPkg, rootPkg)
+
+	authMethods := make([]string, 0)
+	for _, route := range group.Routes {
+		handler := getHandlerName(route)
+		method := strings.TrimSuffix(handler, "Handler")
+		authMethods = append(authMethods, method)
+	}
+
+	authData := map[string]interface{}{
+		"AuthPackage":    authPkg,
+		"AuthName":       authName,
+		"AuthImports":    authImports,
+		"AuthMethods":    genAuthMethods(authName, authMethods),
+		"AuthImplements": genAuthImplements(authName, authMethods),
+	}
+
+	return genFile(fileGenConfig{
+		dir:             dir,
+		subdir:          "auth",
+		filename:        authFilename,
+		templateName:    "authTemplate",
+		category:        category,
+		templateFile:    "auth.tpl",
+		builtinTemplate: authTemplate,
+		data:            authData,
+	})
+}
+
+var authTemplate = `package auth
+
+import (
+	{{.AuthImports}}
+)
+
+type I{{.AuthName}}Auth interface {
+	{{.AuthMethods}}
+}
+
+type {{.AuthName}}Auth struct {
+	authSvc    *bauth.Authorizer
+	identityFn func(ctx context.Context) string
+}
+
+{{.AuthImplements}}
+
+func New{{.AuthName}}Auth(auth *bauth.Authorizer, iFn func(ctx context.Context) string) I{{.AuthName}}Auth {
+	return &{{.AuthName}}Auth{authSvc: auth, identityFn: iFn}
+}
+`
+
+func genAuthMethods(authName string, authActions []string) string {
+	var methods []string
+	for _, action := range authActions {
+		method := fmt.Sprintf(`Can%s(ctx context.Context, r ent.%s) bool`, strings.Title(action), authName)
+		methods = append(methods, method)
+	}
+	return strings.Join(methods, "\n\t")
+}
+
+func genAuthImplements(authName string, authActions []string) string {
+	var implements []string
+	for _, action := range authActions {
+		implement := fmt.Sprintf(`func (a %sAuth) Can%s(ctx context.Context, r ent.%s) bool {
+	can, err := a.authSvc.Enforcer.Enforce(a.identityFn(ctx), r, "%s::%s")
+	if err != nil {
+		logx.WithContext(ctx).Errorf("enforce %s::%s fail: %%v", err)
+		return false
+	}
+	return can
+}`, authName, strings.Title(action), authName, strings.ToLower(authName), action, strings.ToLower(authName), action)
+		implements = append(implements, implement)
+	}
+	return strings.Join(implements, "\n\n")
 }
