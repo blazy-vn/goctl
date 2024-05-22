@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/blazy-vn/goctl/api/spec"
+	util2 "github.com/blazy-vn/goctl/api/util"
 	"github.com/blazy-vn/goctl/config"
 	"github.com/blazy-vn/goctl/util"
 	"github.com/blazy-vn/goctl/util/format"
@@ -48,8 +49,8 @@ func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route
 			"HandlerName":    handler,
 			"RequestType":    util.Title(route.RequestTypeName()),
 			"LogicName":      logicName,
-			"LogicType":      strings.Title(getLogicName(route)),
-			"Call":           strings.Title(strings.TrimSuffix(handler, "Handler")),
+			"LogicType":      util.Title(getLogicName(route)),
+			"Call":           util.Title(strings.TrimSuffix(handler, "Handler")),
 			"HasResp":        len(route.ResponseTypeName()) > 0,
 			"HasRequest":     len(route.RequestTypeName()) > 0,
 			"HasDoc":         len(route.JoinedDoc()) > 0,
@@ -202,8 +203,8 @@ func genAuthImplements(authName string, authActions []string) string {
 	var implements []string
 	for _, action := range authActions {
 		data := map[string]string{
-			"AuthName":      authName,
-			"Action":        strings.Title(action),
+			"AuthName":      util2.ToCamelCase(authName),
+			"Action":        util.Title(action),
 			"AuthNameLower": strings.ToLower(authName),
 			"ActionLower":   strings.ToLower(action),
 		}
@@ -231,7 +232,7 @@ func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) er
 		}
 
 		authName = strings.TrimSuffix(authName, "s")
-		authName = strings.Title(authName)
+		authName = util2.ToCamelCase(util.Title(authName))
 
 		authMethods := make([]string, 0)
 		for _, route := range group.Routes {
