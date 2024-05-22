@@ -142,7 +142,7 @@ func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
 	}
 
 	authName = strings.TrimSuffix(authName, "s")
-	authName = strings.Title(authName)
+	authName = util2.ToCamelCase(authName)
 
 	authPkg := fmt.Sprintf("%s/auth", rootPkg)
 	authFilename := fmt.Sprintf("%s.go", strings.ToLower(authName))
@@ -190,7 +190,7 @@ var authErrorTemplate string
 func genAuthMethods(authName string, authActions []string) string {
 	var methods []string
 	for _, action := range authActions {
-		method := fmt.Sprintf(`Can%s(ctx context.Context, r ent.%s) bool`, strings.Title(action), authName)
+		method := fmt.Sprintf(`Can%s(ctx context.Context, r ent.%s) bool`, util.Title(action), util2.ToCamelCase(authName))
 		methods = append(methods, method)
 	}
 	return strings.Join(methods, "\n\t")
