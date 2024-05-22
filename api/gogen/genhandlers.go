@@ -187,7 +187,6 @@ func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
 
 	return genFile(fileGenConfig{
 		dir:             dir,
-		subdir:          "auth",
 		filename:        authFilename,
 		templateName:    "authTemplate",
 		category:        category,
@@ -238,7 +237,7 @@ func genAuthImplements(authName string, authActions []string) string {
 		return false
 	}
 	return can
-}`, authName, strings.Title(action), strings.ToLower(authName), strings.ToLower(authName), action, strings.ToLower(authName), strings.ToLower(action))
+}`, authName, strings.Title(action), authName, strings.ToLower(authName), action, strings.ToLower(authName), strings.ToLower(action))
 		implements = append(implements, implement)
 	}
 	return strings.Join(implements, "\n\n")
@@ -278,7 +277,6 @@ func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) er
 
 	return genFile(fileGenConfig{
 		dir:             dir,
-		subdir:          "",
 		filename:        "error.go",
 		templateName:    "authErrorTemplate",
 		category:        category,
@@ -304,7 +302,7 @@ func genAuthErrorVars(authName string, authActions []string, baseErrCode int) st
 	for i, action := range authActions {
 		errCode := baseErrCode + i + 1
 		errName := fmt.Sprintf("Err%s%sDenied", authName, strings.Title(action))
-		errMsg := fmt.Sprintf("You do not have permission to perform this action: %s::%s", strings.ToLower(authName), action)
+		errMsg := fmt.Sprintf("You do not have permission to perform this action: %s::%s", strings.ToLower(authName), strings.ToLower(action))
 		errorVar := fmt.Sprintf("%s = berr.NewErrCodeMsg(%d, \"%s\")", errName, errCode, errMsg)
 		errorVars = append(errorVars, errorVar)
 	}
