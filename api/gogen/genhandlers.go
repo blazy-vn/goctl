@@ -75,12 +75,14 @@ func doGenToFile(dir, handler string, cfg *config.Config, group spec.Group,
 }
 
 func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
-	if err := genAuthError(authDir, rootPkg, cfg, api); err != nil {
+	authPath := path.Join(dir, authDir)
+
+	if err := genAuthError(authPath, rootPkg, cfg, api); err != nil {
 		return err
 	}
 
 	for _, group := range api.Service.Groups {
-		if err := genAuth(authDir, rootPkg, cfg, group); err != nil {
+		if err := genAuth(authPath, rootPkg, cfg, group); err != nil {
 			return err
 		}
 
