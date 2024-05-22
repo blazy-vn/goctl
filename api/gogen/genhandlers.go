@@ -142,10 +142,10 @@ func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
 	}
 
 	authName = strings.TrimSuffix(authName, "s")
+	authFilename := fmt.Sprintf("%s.go", strings.ToLower(authName))
 	authName = util2.ToCamelCase(authName)
 
 	authPkg := fmt.Sprintf("%s/auth", rootPkg)
-	authFilename := fmt.Sprintf("%s.go", strings.ToLower(authName))
 
 	pkgParts := strings.Split(rootPkg, "/")
 	moduleName := pkgParts[0]
