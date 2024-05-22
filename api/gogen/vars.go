@@ -7,6 +7,7 @@ const (
 	contextDir    = internal + "svc"
 	handlerDir    = internal + "handler"
 	logicDir      = internal + "logic"
+	authDir       = internal + "auth"
 	middlewareDir = internal + "middleware"
 	typesDir      = internal + typesPacket
 	groupProperty = "group"
