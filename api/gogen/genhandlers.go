@@ -203,7 +203,7 @@ func genAuthImplements(authName string, authActions []string) string {
 	var implements []string
 	for _, action := range authActions {
 		data := map[string]string{
-			"AuthName":      util2.ToCamelCase(authName),
+			"AuthName":      authName,
 			"Action":        util.Title(action),
 			"AuthNameLower": strings.ToLower(authName),
 			"ActionLower":   strings.ToLower(action),
