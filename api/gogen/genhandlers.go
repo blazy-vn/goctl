@@ -277,7 +277,7 @@ func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) er
 
 	return genFile(fileGenConfig{
 		dir:             dir,
-		subdir:          "auth",
+		subdir:          "",
 		filename:        "error.go",
 		templateName:    "authErrorTemplate",
 		category:        category,
