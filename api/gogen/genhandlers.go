@@ -237,7 +237,7 @@ func genAuthImplements(authName string, authActions []string) string {
 		return false
 	}
 	return can
-}`, authName, strings.Title(action), authName, strings.ToLower(authName), action, strings.ToLower(authName), strings.ToLower(action))
+}`, authName, strings.Title(action), authName, strings.ToLower(authName), strings.ToLower(action), strings.ToLower(authName), strings.ToLower(action))
 		implements = append(implements, implement)
 	}
 	return strings.Join(implements, "\n\n")
