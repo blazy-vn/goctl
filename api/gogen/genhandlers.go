@@ -205,8 +205,8 @@ func genAuthImplements(authName string, authActions []string) string {
 		data := map[string]string{
 			"AuthName":      authName,
 			"Action":        util.Title(action),
-			"AuthNameLower": strings.ToLower(authName),
-			"ActionLower":   strings.ToLower(action),
+			"AuthNameLower": strings.ToLower(util2.ToSnakeCase(authName)),
+			"ActionLower":   strings.ToLower(util2.ToSnakeCase(action)),
 		}
 		var buf bytes.Buffer
 		err := template.Must(template.New("authImplement").Parse(authImplementTemplate)).Execute(&buf, data)
@@ -232,7 +232,7 @@ func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) er
 		}
 
 		authName = strings.TrimSuffix(authName, "s")
-		authName = util2.ToCamelCase(util.Title(authName))
+		authName = util2.ToCamelCase(authName)
 
 		authMethods := make([]string, 0)
 		for _, route := range group.Routes {
@@ -266,7 +266,9 @@ func genAuthErrorVars(authName string, authActions []string, baseErrCode int) st
 	for i, action := range authActions {
 		errCode := baseErrCode + i + 1
 		errName := fmt.Sprintf("Err%s%sDenied", authName, strings.Title(action))
-		errMsg := fmt.Sprintf("You do not have permission to perform this action: %s::%s", strings.ToLower(authName), strings.ToLower(action))
+		errMsg := fmt.Sprintf("You do not have permission to perform this action: %s::%s",
+			strings.ToLower(util2.ToSnakeCase(authName)),
+			strings.ToLower(util2.ToSnakeCase(action)))
 		errorVar := fmt.Sprintf("%s = berr.NewErrCodeMsg(%d, \"%s\")", errName, errCode, errMsg)
 		errorVars = append(errorVars, errorVar)
 	}
