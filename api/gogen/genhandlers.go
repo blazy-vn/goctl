@@ -1,10 +1,12 @@
 package gogen
 
 import (
+	"bytes"
 	_ "embed"
 	"fmt"
 	"path"
 	"strings"
+	"text/template"
 
 	"github.com/blazy-vn/goctl/api/spec"
 	"github.com/blazy-vn/goctl/config"
@@ -196,27 +198,11 @@ func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
 	})
 }
 
-var authTemplate = `package auth
+//go:embed auth.tpl
+var authTemplate string
 
-import (
-	{{.AuthImports}}
-)
-
-type I{{.AuthName}}Auth interface {
-	{{.AuthMethods}}
-}
-
-type {{.AuthName}}Auth struct {
-	authSvc    *bauth.Authorizer
-	identityFn func(ctx context.Context) string
-}
-
-{{.AuthImplements}}
-
-func New{{.AuthName}}Auth(auth *bauth.Authorizer, iFn func(ctx context.Context) string) I{{.AuthName}}Auth {
-	return &{{.AuthName}}Auth{authSvc: auth, identityFn: iFn}
-}
-`
+//go:embed auth_error.tpl
+var authErrorTemplate string
 
 func genAuthMethods(authName string, authActions []string) string {
 	var methods []string
@@ -227,18 +213,24 @@ func genAuthMethods(authName string, authActions []string) string {
 	return strings.Join(methods, "\n\t")
 }
 
+//go:embed auth_implement.tpl
+var authImplementTemplate string
+
 func genAuthImplements(authName string, authActions []string) string {
 	var implements []string
 	for _, action := range authActions {
-		implement := fmt.Sprintf(`func (a %sAuth) Can%s(ctx context.Context, r ent.%s) bool {
-	can, err := a.authSvc.Enforcer.Enforce(a.identityFn(ctx), r, "%s::%s")
-	if err != nil {
-		logx.WithContext(ctx).Errorf("enforce %s::%s fail: %%v", err)
-		return false
-	}
-	return can
-}`, authName, strings.Title(action), authName, strings.ToLower(authName), strings.ToLower(action), strings.ToLower(authName), strings.ToLower(action))
-		implements = append(implements, implement)
+		data := map[string]string{
+			"AuthName":      authName,
+			"Action":        strings.Title(action),
+			"AuthNameLower": strings.ToLower(authName),
+			"ActionLower":   strings.ToLower(action),
+		}
+		var buf bytes.Buffer
+		err := template.Must(template.New("authImplement").Parse(authImplementTemplate)).Execute(&buf, data)
+		if err != nil {
+			panic(err)
+		}
+		implements = append(implements, buf.String())
 	}
 	return strings.Join(implements, "\n\n")
 }
@@ -285,17 +277,6 @@ func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) er
 		data:            authData,
 	})
 }
-
-var authErrorTemplate = `package auth
-
-import (
-	{{.ErrImports}}
-)
-
-var (
-	{{.ErrVars}}
-)
-`
 
 func genAuthErrorVars(authName string, authActions []string, baseErrCode int) string {
 	var errorVars []string
