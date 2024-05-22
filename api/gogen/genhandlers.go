@@ -312,5 +312,5 @@ func genAuthErrorVars(authName string, authActions []string, baseErrCode int) st
 }
 
 func getBaseErrCode(groupIndex int) int {
-	return 2001 + groupIndex*100
+	return 2000 + groupIndex*100
 }
