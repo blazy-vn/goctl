@@ -258,6 +258,7 @@ func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) er
 		}
 
 		authName = strings.TrimSuffix(authName, "s")
+		authName = strings.Title(authName)
 
 		authMethods := make([]string, 0)
 		for _, route := range group.Routes {
