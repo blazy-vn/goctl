@@ -1,4 +1,3 @@
-// auth_error.tpl
 package auth
 
 import (
