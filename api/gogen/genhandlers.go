@@ -155,9 +155,10 @@ func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
 	}
 
 	authName = strings.TrimSuffix(authName, "s")
+	authName = strings.Title(authName)
 
 	authPkg := fmt.Sprintf("%s/auth", rootPkg)
-	authFilename := fmt.Sprintf("%s.go", authName)
+	authFilename := fmt.Sprintf("%s.go", strings.ToLower(authName))
 
 	pkgParts := strings.Split(rootPkg, "/")
 	moduleName := pkgParts[0]
@@ -235,7 +236,7 @@ func genAuthImplements(authName string, authActions []string) string {
 		return false
 	}
 	return can
-}`, authName, strings.Title(action), authName, strings.ToLower(authName), action, strings.ToLower(authName), strings.ToLower(action))
+}`, authName, strings.Title(action), strings.ToLower(authName), strings.ToLower(authName), action, strings.ToLower(authName), strings.ToLower(action))
 		implements = append(implements, implement)
 	}
 	return strings.Join(implements, "\n\n")
