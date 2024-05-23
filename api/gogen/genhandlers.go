@@ -66,6 +66,10 @@ func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) err
 		return err
 	}
 
+	if err := genPolicyFile("etc", rootPkg, cfg, api); err != nil {
+		return err
+	}
+
 	for _, group := range api.Service.Groups {
 		if err := genAuth(authPath, rootPkg, cfg, group); err != nil {
 			return err
@@ -273,6 +277,37 @@ func genAuthErrorVars(authName string, authActions []string, baseErrCode int) st
 		errorVars = append(errorVars, errorVar)
 	}
 	return strings.Join(errorVars, "\n\t")
+}
+
+func genPolicyFile(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
+	var policyLines []string
+	for _, group := range api.Service.Groups {
+		authName := group.GetAnnotation(groupProperty)
+		if len(authName) == 0 {
+			continue
+		}
+
+		authName = strings.ToLower(util2.ToSnakeCase(authName))
+		policyLines = append(policyLines, fmt.Sprintf("p, %s_management, %s::*, true", authName, authName))
+
+		for _, route := range group.Routes {
+			handler := getHandlerName(route)
+			method := strings.ToLower(util2.ToSnakeCase(strings.TrimSuffix(handler, "Handler")))
+			policyLines = append(policyLines, fmt.Sprintf("p, %s_%s, %s::%s, true", authName, method, authName, method))
+		}
+	}
+
+	policyData := strings.Join(policyLines, "\n")
+
+	return genFile(fileGenConfig{
+		dir:             dir,
+		filename:        "auth_policy.csv",
+		category:        category,
+		data:            policyData,
+		templateName:    "", // Không cần template
+		templateFile:    "",
+		builtinTemplate: "",
+	})
 }
 
 func getBaseErrCode(groupIndex int) int {
