@@ -66,7 +66,7 @@ func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) err
 		return err
 	}
 
-	if err := genPolicyFile("etc", rootPkg, cfg, api); err != nil {
+	if err := genPolicyFile(path.Join(dir, "etc"), rootPkg, cfg, api); err != nil {
 		return err
 	}
 
@@ -299,15 +299,12 @@ func genPolicyFile(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) e
 
 	policyData := strings.Join(policyLines, "\n")
 
-	return genFile(fileGenConfig{
-		dir:             dir,
-		filename:        "auth_policy.csv",
-		category:        category,
-		data:            policyData,
-		templateName:    "", // Không cần template
-		templateFile:    "",
-		builtinTemplate: "",
-	})
+	fp, _, err := util2.MaybeCreateFile(dir, "", "auth_policy.csv")
+	if fp != nil {
+		_, err = fp.WriteString(policyData)
+	}
+
+	return err
 }
 
 func getBaseErrCode(groupIndex int) int {
