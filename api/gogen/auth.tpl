@@ -1,4 +1,3 @@
-// auth.tpl
 package auth
 
 import (
