@@ -62,17 +62,23 @@ func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route
 func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 	authPath := path.Join(dir, authDir)
 
-	if err := genAuthError(authPath, rootPkg, cfg, api); err != nil {
-		return err
+	if VarBoolAuth {
+		if err := genAuthError(authPath, rootPkg, cfg, api); err != nil {
+			return err
+		}
 	}
 
-	if err := genPolicyFile(path.Join(dir, "etc"), rootPkg, cfg, api); err != nil {
-		return err
+	if VarBoolAuth {
+		if err := genPolicyFile(path.Join(dir, "etc"), rootPkg, cfg, api); err != nil {
+			return err
+		}
 	}
 
 	for _, group := range api.Service.Groups {
-		if err := genAuth(authPath, rootPkg, cfg, group); err != nil {
-			return err
+		if VarBoolAuth {
+			if err := genAuth(authPath, rootPkg, cfg, group); err != nil {
+				return err
+			}
 		}
 
 		for _, route := range group.Routes {

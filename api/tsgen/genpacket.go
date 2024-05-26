@@ -32,14 +32,14 @@ func genHandler(dir, webAPI, caller string, api *spec.ApiSpec, unwrapAPI bool) e
 
 	imports := ""
 	if len(caller) == 0 {
-		caller = "webapi"
+		caller = "service"
 	}
 	importCaller := caller
 	if unwrapAPI {
 		importCaller = "{ " + importCaller + " }"
 	}
 	if len(webAPI) > 0 {
-		imports += `import ` + importCaller + ` from ` + `"./gocliRequest"`
+		imports += `import ` + importCaller + ` from ` + `"./http"`
 	}
 
 	if len(api.Types) != 0 {
@@ -47,7 +47,7 @@ func genHandler(dir, webAPI, caller string, api *spec.ApiSpec, unwrapAPI bool) e
 			imports += pathx.NL
 		}
 		outputFile := apiutil.ComponentName(api)
-		imports += fmt.Sprintf(`import * as components from "%s"`, "./"+outputFile)
+		imports += fmt.Sprintf(`import * as types from "%s"`, "./"+outputFile)
 		imports += fmt.Sprintf(`%sexport * from "%s"`, pathx.NL, "./"+outputFile)
 	}
 
@@ -72,13 +72,13 @@ func genAPI(api *spec.ApiSpec, caller string) (string, error) {
 				return "", fmt.Errorf("missing handler annotation for route %q", route.Path)
 			}
 
-			handler = util.Untitle(handler)
+			//handler = util.Untitle(handler)
 			handler = strings.Replace(handler, "Handler", "", 1)
 			comment := commentForRoute(route)
 			if len(comment) > 0 {
 				fmt.Fprintf(&builder, "%s\n", comment)
 			}
-			fmt.Fprintf(&builder, "export function %s(%s) {\n", handler, paramsForRoute(route))
+			fmt.Fprintf(&builder, "export function %s(%s) {\n", group.GetAnnotation("group")+handler, paramsForRoute(route))
 			writeIndent(&builder, 1)
 			responseGeneric := "<null>"
 			if len(route.ResponseTypeName()) > 0 {
@@ -87,7 +87,7 @@ func genAPI(api *spec.ApiSpec, caller string) (string, error) {
 					return "", err
 				}
 
-				responseGeneric = fmt.Sprintf("<%s>", val)
+				responseGeneric = fmt.Sprintf("<types.GenericResponse<%s>>", val)
 			}
 			fmt.Fprintf(&builder, `return %s.%s%s(%s)`, caller, strings.ToLower(route.Method),
 				util.Title(responseGeneric), callParamsForRoute(route, group))
