@@ -72,13 +72,13 @@ func genAPI(api *spec.ApiSpec, caller string) (string, error) {
 				return "", fmt.Errorf("missing handler annotation for route %q", route.Path)
 			}
 
-			handler = util.Untitle(handler)
+			//handler = util.Untitle(handler)
 			handler = strings.Replace(handler, "Handler", "", 1)
 			comment := commentForRoute(route)
 			if len(comment) > 0 {
 				fmt.Fprintf(&builder, "%s\n", comment)
 			}
-			fmt.Fprintf(&builder, "export function %s(%s) {\n", handler, paramsForRoute(route))
+			fmt.Fprintf(&builder, "export function %s(%s) {\n", group.GetAnnotation("group")+handler, paramsForRoute(route))
 			writeIndent(&builder, 1)
 			responseGeneric := "<null>"
 			if len(route.ResponseTypeName()) > 0 {

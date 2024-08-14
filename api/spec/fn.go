@@ -142,16 +142,34 @@ func (m Member) IsFormMember() bool {
 // IsTagMember returns true if contains given tag
 func (m Member) IsTagMember(tagKey string) bool {
 	if m.IsInline {
-		return true
+		// Kiểm tra đệ quy các trường của struct inline
+		inlineType, ok := m.Type.(DefineStruct)
+		if ok {
+			for _, member := range inlineType.Members {
+				if member.IsTagMember(tagKey) {
+					return true
+				}
+			}
+		}
+		return false
 	}
 
-	tags := m.Tags()
-	for _, tag := range tags {
-		if tag.Key == tagKey {
-			return true
+	tags := m.parseTags()
+	_, exists := tags[tagKey]
+	return exists
+}
+
+func (m Member) parseTags() map[string]string {
+	tags := make(map[string]string)
+	for _, tag := range strings.Split(m.Tag, " ") {
+		parts := strings.SplitN(tag, ":", 2)
+		if len(parts) == 2 {
+			key := strings.Trim(parts[0], "`")
+			value := strings.Trim(parts[1], "\"`")
+			tags[key] = value
 		}
 	}
-	return false
+	return tags
 }
 
 // GetEnumOptions return a slice contains all enumeration options
