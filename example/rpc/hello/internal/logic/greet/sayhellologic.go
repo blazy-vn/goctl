@@ -5,7 +5,6 @@ import (
 
 	"github.com/blazy-vn/goctl/example/rpc/hello/internal/svc"
 	"github.com/blazy-vn/goctl/example/rpc/hello/pb/hello"
-
 	"github.com/zeromicro/go-zero/core/logx"
 )
 

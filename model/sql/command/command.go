@@ -5,9 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/go-sql-driver/mysql"
-	"github.com/spf13/cobra"
-
 	"github.com/blazy-vn/goctl/config"
 	"github.com/blazy-vn/goctl/model/sql/command/migrationnotes"
 	"github.com/blazy-vn/goctl/model/sql/gen"
@@ -16,6 +13,8 @@ import (
 	file "github.com/blazy-vn/goctl/util"
 	"github.com/blazy-vn/goctl/util/console"
 	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/go-sql-driver/mysql"
+	"github.com/spf13/cobra"
 	"github.com/zeromicro/go-zero/core/collection"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/postgres"

@@ -11,6 +11,7 @@ import (
 	"github.com/blazy-vn/goctl/api/spec"
 	apiutil "github.com/blazy-vn/goctl/api/util"
 	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/blazy-vn/goctl/util"
 	"github.com/blazy-vn/goctl/util/format"
 )
@@ -64,6 +65,7 @@ func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 		data: map[string]any{
 			"types":        val,
 			"containsTime": false,
+			"version":      version.BuildVersion,
 		},
 	})
 }
@@ -74,8 +76,21 @@ func writeType(writer io.Writer, tp spec.Type) error {
 		return fmt.Errorf("unspport struct type: %s", tp.Name())
 	}
 
-	fmt.Fprintf(writer, "type %s struct {\n", util.Title(tp.Name()))
-	for _, member := range structType.Members {
+	_, err := fmt.Fprintf(writer, "type %s struct {\n", util.Title(tp.Name()))
+	if err != nil {
+		return err
+	}
+
+	if err := writeMember(writer, structType.Members); err != nil {
+		return err
+	}
+
+	_, err = fmt.Fprintf(writer, "}")
+	return err
+}
+
+func writeMember(writer io.Writer, members []spec.Member) error {
+	for _, member := range members {
 		if member.IsInline {
 			if _, err := fmt.Fprintf(writer, "%s\n", strings.Title(member.Type.Name())); err != nil {
 				return err
@@ -88,6 +103,5 @@ func writeType(writer io.Writer, tp spec.Type) error {
 			return err
 		}
 	}
-	fmt.Fprintf(writer, "}")
 	return nil
 }

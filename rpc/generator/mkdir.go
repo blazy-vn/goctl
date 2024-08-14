@@ -1,13 +1,13 @@
 package generator
 
 import (
-	"github.com/blazy-vn/goctl/util/format"
 	"path/filepath"
 	"strings"
 
 	conf "github.com/blazy-vn/goctl/config"
 	"github.com/blazy-vn/goctl/rpc/parser"
 	"github.com/blazy-vn/goctl/util/ctx"
+	"github.com/blazy-vn/goctl/util/format"
 	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/blazy-vn/goctl/util/stringx"
 )

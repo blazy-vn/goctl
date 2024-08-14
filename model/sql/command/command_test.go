@@ -8,11 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/blazy-vn/goctl/config"
 	"github.com/blazy-vn/goctl/model/sql/gen"
 	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/stretchr/testify/assert"
 )
 
 var (

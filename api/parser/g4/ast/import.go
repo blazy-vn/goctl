@@ -1,8 +1,6 @@
 package ast
 
-import (
-	"github.com/blazy-vn/goctl/api/parser/g4/gen/api"
-)
+import "github.com/blazy-vn/goctl/api/parser/g4/gen/api"
 
 // ImportExpr defines import syntax for api
 type ImportExpr struct {

@@ -13,6 +13,7 @@ import (
 
 	"github.com/blazy-vn/goctl/api/spec"
 	apiutil "github.com/blazy-vn/goctl/api/util"
+	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/blazy-vn/goctl/util"
 	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/zeromicro/go-zero/core/stringx"
@@ -131,6 +132,7 @@ func (c *componentsContext) createComponent(dir, packetName string, ty spec.Type
 		"className":         util.Title(defineStruct.Name()),
 		"superClassName":    superClassName,
 		"HasProperty":       len(strings.TrimSpace(propertiesString)) > 0,
+		"version":           version.BuildVersion,
 	})
 	if err != nil {
 		return err

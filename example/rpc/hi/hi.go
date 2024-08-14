@@ -9,7 +9,6 @@ import (
 	greetServer "github.com/blazy-vn/goctl/example/rpc/hi/internal/server/greet"
 	"github.com/blazy-vn/goctl/example/rpc/hi/internal/svc"
 	"github.com/blazy-vn/goctl/example/rpc/hi/pb/hi"
-
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/zrpc"

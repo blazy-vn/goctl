@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/blazy-vn/goctl/model/mongo/template"
 	"github.com/blazy-vn/goctl/util"
 	"github.com/blazy-vn/goctl/util/format"
@@ -59,6 +60,7 @@ func generateModel(ctx *Context) error {
 			"Type":      stringx.From(t).Title(),
 			"lowerType": stringx.From(t).Untitle(),
 			"Cache":     ctx.Cache,
+			"version":   version.BuildVersion,
 		}, output, true); err != nil {
 			return err
 		}
