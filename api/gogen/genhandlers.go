@@ -200,7 +200,7 @@ var authErrorTemplate string
 func genAuthMethods(authName string, authActions []string) string {
 	var methods []string
 	for _, action := range authActions {
-		method := fmt.Sprintf(`Can%s(ctx context.Context, r *ent.%s) bool`, util.Title(action), util2.ToCamelCase(authName))
+		method := fmt.Sprintf(`Can%s(ctx context.Context, r *ent.%s) bool`, util.Title(action), authName)
 		methods = append(methods, method)
 	}
 	return strings.Join(methods, "\n\t")
