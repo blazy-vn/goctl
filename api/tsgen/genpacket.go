@@ -46,9 +46,10 @@ func genHandler(dir, webAPI, caller string, api *spec.ApiSpec, unwrapAPI bool) e
 		if len(imports) > 0 {
 			imports += pathx.NL
 		}
-		outputFile := apiutil.ComponentName(api)
-		imports += fmt.Sprintf(`import * as types from "%s"`, "./"+outputFile)
-		imports += fmt.Sprintf(`%sexport * from "%s"`, pathx.NL, "./"+outputFile)
+		//outputFile := apiutil.ComponentName(api)
+		//TODO hardcode
+		imports += fmt.Sprintf(`import * as types from "%s"`, "./"+"bcare-types-v2")
+		//imports += fmt.Sprintf(`%sexport * from "%s"`, pathx.NL, "./"+outputFile)
 	}
 
 	apis, err := genAPI(api, caller)
