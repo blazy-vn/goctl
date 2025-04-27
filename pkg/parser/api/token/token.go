@@ -3,8 +3,8 @@ package token
 import (
 	"fmt"
 
-	"github.com/blazy-vn/goctl/pkg/parser/api/placeholder"
-	"github.com/blazy-vn/goctl/util"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/placeholder"
+	"github.com/zeromicro/go-zero/tools/goctl/util"
 )
 
 const (
@@ -127,7 +127,6 @@ const (
 	STRING     // "abc"
 	RAW_STRING // `abc`
 	PATH       // `abc`
-	KEY        // `abc:`
 	literal_end
 
 	operator_beg
@@ -213,7 +212,6 @@ var tokens = [...]string{
 	STRING:     "STRING",
 	RAW_STRING: "RAW_STRING",
 	PATH:       "PATH",
-	KEY:        "KEY",
 
 	SUB:    "-",
 	MUL:    "*",

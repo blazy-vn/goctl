@@ -7,19 +7,18 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/spf13/cobra"
-
-	"github.com/blazy-vn/goctl/config"
-	"github.com/blazy-vn/goctl/model/sql/command/migrationnotes"
-	"github.com/blazy-vn/goctl/model/sql/gen"
-	"github.com/blazy-vn/goctl/model/sql/model"
-	"github.com/blazy-vn/goctl/model/sql/util"
-	file "github.com/blazy-vn/goctl/util"
-	"github.com/blazy-vn/goctl/util/console"
-	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/zeromicro/go-zero/core/collection"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/postgres"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"github.com/zeromicro/go-zero/tools/goctl/config"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/command/migrationnotes"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/gen"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/model"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/util"
+	file "github.com/zeromicro/go-zero/tools/goctl/util"
+	"github.com/zeromicro/go-zero/tools/goctl/util/console"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 var (
@@ -51,6 +50,8 @@ var (
 	VarBoolStrict bool
 	// VarStringSliceIgnoreColumns represents the columns which are ignored.
 	VarStringSliceIgnoreColumns []string
+	// VarStringCachePrefix describes the prefix of cache.
+	VarStringCachePrefix string
 )
 
 var errNotMatched = errors.New("sql not matched")
@@ -58,6 +59,9 @@ var errNotMatched = errors.New("sql not matched")
 // MysqlDDL generates model code from ddl
 func MysqlDDL(_ *cobra.Command, _ []string) error {
 	migrationnotes.BeforeCommands(VarStringDir, VarStringStyle)
+	if VarBoolCache && len(VarStringCachePrefix) == 0 {
+		return errors.New("cache prefix is empty")
+	}
 	src := VarStringSrc
 	dir := VarStringDir
 	cache := VarBoolCache
@@ -90,6 +94,7 @@ func MysqlDDL(_ *cobra.Command, _ []string) error {
 		database:      database,
 		strict:        VarBoolStrict,
 		ignoreColumns: mergeColumns(VarStringSliceIgnoreColumns),
+		prefix:        VarStringCachePrefix,
 	}
 	return fromDDL(arg)
 }
@@ -97,6 +102,9 @@ func MysqlDDL(_ *cobra.Command, _ []string) error {
 // MySqlDataSource generates model code from datasource
 func MySqlDataSource(_ *cobra.Command, _ []string) error {
 	migrationnotes.BeforeCommands(VarStringDir, VarStringStyle)
+	if VarBoolCache && len(VarStringCachePrefix) == 0 {
+		return errors.New("cache prefix is empty")
+	}
 	url := strings.TrimSpace(VarStringURL)
 	dir := strings.TrimSpace(VarStringDir)
 	cache := VarBoolCache
@@ -131,6 +139,7 @@ func MySqlDataSource(_ *cobra.Command, _ []string) error {
 		idea:          idea,
 		strict:        VarBoolStrict,
 		ignoreColumns: mergeColumns(VarStringSliceIgnoreColumns),
+		prefix:        VarStringCachePrefix,
 	}
 	return fromMysqlDataSource(arg)
 }
@@ -226,6 +235,7 @@ type ddlArg struct {
 	database      string
 	strict        bool
 	ignoreColumns []string
+	prefix        string
 }
 
 func fromDDL(arg ddlArg) error {
@@ -244,7 +254,7 @@ func fromDDL(arg ddlArg) error {
 		return errNotMatched
 	}
 
-	generator, err := gen.NewDefaultGenerator(arg.dir, arg.cfg,
+	generator, err := gen.NewDefaultGenerator(arg.prefix, arg.dir, arg.cfg,
 		gen.WithConsoleOption(log), gen.WithIgnoreColumns(arg.ignoreColumns))
 	if err != nil {
 		return err
@@ -267,6 +277,7 @@ type dataSourceArg struct {
 	cache, idea   bool
 	strict        bool
 	ignoreColumns []string
+	prefix        string
 }
 
 func fromMysqlDataSource(arg dataSourceArg) error {
@@ -319,7 +330,7 @@ func fromMysqlDataSource(arg dataSourceArg) error {
 		return errors.New("no tables matched")
 	}
 
-	generator, err := gen.NewDefaultGenerator(arg.dir, arg.cfg,
+	generator, err := gen.NewDefaultGenerator(arg.prefix, arg.dir, arg.cfg,
 		gen.WithConsoleOption(log), gen.WithIgnoreColumns(arg.ignoreColumns))
 	if err != nil {
 		return err
@@ -370,7 +381,7 @@ func fromPostgreSqlDataSource(url string, pattern pattern, dir, schema string, c
 		return errors.New("no tables matched")
 	}
 
-	generator, err := gen.NewDefaultGenerator(dir, cfg, gen.WithConsoleOption(log), gen.WithPostgreSql(), gen.WithIgnoreColumns(ignoreColumns))
+	generator, err := gen.NewDefaultGenerator("", dir, cfg, gen.WithConsoleOption(log), gen.WithPostgreSql(), gen.WithIgnoreColumns(ignoreColumns))
 	if err != nil {
 		return err
 	}

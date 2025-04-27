@@ -3,16 +3,16 @@ package generator
 import (
 	"path/filepath"
 
-	"github.com/blazy-vn/goctl/rpc/parser"
-	"github.com/blazy-vn/goctl/util/console"
-	"github.com/blazy-vn/goctl/util/ctx"
-	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/zeromicro/go-zero/tools/goctl/rpc/parser"
+	"github.com/zeromicro/go-zero/tools/goctl/util/console"
+	"github.com/zeromicro/go-zero/tools/goctl/util/ctx"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 type ZRpcContext struct {
-	// Sre is the source file of the proto.
+	// Src is the source file of the proto.
 	Src string
-	// ProtoCmd is the command to generate proto files.
+	// ProtocCmd is the command to generate proto files.
 	ProtocCmd string
 	// ProtoGenGrpcDir is the directory to store the generated proto files.
 	ProtoGenGrpcDir string

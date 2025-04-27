@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/gookit/color"
+	"github.com/zeromicro/go-zero/tools/goctl/internal/version"
 )
 
 // NL defines a new line.
@@ -98,11 +98,14 @@ func GetGoctlHome() (home string, err error) {
 
 // GetDefaultGoctlHome returns the path value of the goctl home where Join $HOME with .goctl.
 func GetDefaultGoctlHome() (string, error) {
+	var goctlHomeDir = goctlDir
 	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
+	if err == nil {
+		goctlHomeDir = filepath.Join(home, goctlDir)
 	}
-	return filepath.Join(home, goctlDir), nil
+
+	_ = MkdirIfNotExist(goctlHomeDir)
+	return goctlHomeDir, nil
 }
 
 // GetGitHome returns the git home of goctl.

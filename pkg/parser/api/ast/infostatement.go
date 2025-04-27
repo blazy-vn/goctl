@@ -1,6 +1,6 @@
 package ast
 
-import "github.com/blazy-vn/goctl/pkg/parser/api/token"
+import "github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
 
 // InfoStmt is the info statement.
 type InfoStmt struct {
@@ -46,7 +46,8 @@ func (i *InfoStmt) Format(prefix ...string) string {
 	w.Write(withNode(infoNode, i.LParen))
 	w.NewLine()
 	for _, v := range i.Values {
-		node := transferTokenNode(v.Key, withTokenNodePrefix(peekOne(prefix)+Indent), ignoreLeadingComment())
+		node := transferNilInfixNode([]*TokenNode{v.Key, v.Colon})
+		node = transferTokenNode(node, withTokenNodePrefix(peekOne(prefix)+Indent), ignoreLeadingComment())
 		w.Write(withNode(node, v.Value), expectIndentInfix(), expectSameLine())
 		w.NewLine()
 	}

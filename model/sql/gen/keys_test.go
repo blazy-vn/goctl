@@ -4,9 +4,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/blazy-vn/goctl/model/sql/parser"
-	"github.com/blazy-vn/goctl/util/stringx"
 	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/parser"
+	"github.com/zeromicro/go-zero/tools/goctl/util/stringx"
 )
 
 func TestGenCacheKeys(t *testing.T) {
@@ -34,7 +34,7 @@ func TestGenCacheKeys(t *testing.T) {
 		Comment:    "姓名",
 		SeqInIndex: 2,
 	}
-	primariCacheKey, uniqueCacheKey := genCacheKeys(parser.Table{
+	primariCacheKey, uniqueCacheKey := genCacheKeys("cache", parser.Table{
 		Name: stringx.From("user"),
 		Db:   stringx.From("go_zero"),
 		PrimaryKey: parser.Primary{
@@ -129,7 +129,7 @@ func TestGenCacheKeys(t *testing.T) {
 		}())
 	})
 	t.Run("no database name", func(t *testing.T) {
-		primariCacheKey, _ = genCacheKeys(parser.Table{
+		primariCacheKey, _ = genCacheKeys("cache", parser.Table{
 			Name: stringx.From("user"),
 			Db:   stringx.From(""),
 			PrimaryKey: parser.Primary{

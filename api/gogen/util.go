@@ -7,11 +7,11 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/blazy-vn/goctl/api/spec"
-	"github.com/blazy-vn/goctl/api/util"
-	"github.com/blazy-vn/goctl/pkg/golang"
-	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/zeromicro/go-zero/core/collection"
+	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
+	"github.com/zeromicro/go-zero/tools/goctl/api/util"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/golang"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 type fileGenConfig struct {
@@ -59,16 +59,59 @@ func genFile(c fileGenConfig) error {
 
 func writeProperty(writer io.Writer, name, tag, comment string, tp spec.Type, indent int) error {
 	util.WriteIndent(writer, indent)
-	var err error
+	var (
+		err            error
+		isNestedStruct bool
+	)
+	structType, ok := tp.(spec.NestedStruct)
+	if ok {
+		isNestedStruct = true
+	}
 	if len(comment) > 0 {
 		comment = strings.TrimPrefix(comment, "//")
 		comment = "//" + comment
-		_, err = fmt.Fprintf(writer, "%s %s %s %s\n", strings.Title(name), tp.Name(), tag, comment)
-	} else {
-		_, err = fmt.Fprintf(writer, "%s %s %s\n", strings.Title(name), tp.Name(), tag)
 	}
 
-	return err
+	if isNestedStruct {
+		_, err = fmt.Fprintf(writer, "%s struct {\n", strings.Title(name))
+		if err != nil {
+			return err
+		}
+
+		if err := writeMember(writer, structType.Members); err != nil {
+			return err
+		}
+
+		_, err := fmt.Fprintf(writer, "} %s", tag)
+		if err != nil {
+			return err
+		}
+
+		if len(comment) > 0 {
+			_, err = fmt.Fprintf(writer, " %s", comment)
+			if err != nil {
+				return err
+			}
+		}
+		_, err = fmt.Fprint(writer, "\n")
+		if err != nil {
+			return err
+		}
+	} else {
+		if len(comment) > 0 {
+			_, err = fmt.Fprintf(writer, "%s %s %s %s\n", strings.Title(name), tp.Name(), tag, comment)
+			if err != nil {
+				return err
+			}
+		} else {
+			_, err = fmt.Fprintf(writer, "%s %s %s\n", strings.Title(name), tp.Name(), tag)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func getAuths(api *spec.ApiSpec) []string {

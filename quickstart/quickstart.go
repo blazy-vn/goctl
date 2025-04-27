@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/blazy-vn/goctl/util/console"
-	"github.com/blazy-vn/goctl/util/ctx"
-	"github.com/blazy-vn/goctl/util/pathx"
 	"github.com/spf13/cobra"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/tools/goctl/util/console"
+	"github.com/zeromicro/go-zero/tools/goctl/util/ctx"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 const baseDir = "greet"
@@ -56,12 +56,8 @@ func initProject() {
 	}
 
 	log.Must(pathx.MkdirIfNotExist(projectDir))
-	if hasGoMod, _ := ctx.IsGoMod(projectDir); hasGoMod {
-		return
-	}
-	if exitCode := execCommand(projectDir, "go mod init "+baseDir); exitCode != 0 {
-		log.Fatalln("Init process exit")
-	}
+	_, err = ctx.Prepare(projectDir)
+	logx.Must(err)
 }
 
 func run(_ *cobra.Command, _ []string) error {

@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blazy-vn/goctl/pkg/parser/api/token"
-	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 const (
@@ -28,8 +28,6 @@ const (
 	stringClose
 	// string mode end
 )
-
-var missingInput = errors.New("missing input")
 
 type mode int
 
@@ -446,16 +444,6 @@ func (s *Scanner) scanIdent() token.Token {
 	}
 
 	ident := string(s.data[position:s.position])
-
-	if s.ch == ':' {
-		s.readRune()
-		return token.Token{
-			Type:     token.KEY,
-			Text:     string(s.data[position:s.position]),
-			Position: s.newPosition(position),
-		}
-	}
-
 	if ident == "interface" && s.ch == '{' && s.peekRune() == '}' {
 		s.readRune()
 		s.readRune()
@@ -629,7 +617,7 @@ func NewScanner(filename string, src interface{}) (*Scanner, error) {
 	}
 
 	if len(data) == 0 {
-		return nil, missingInput
+		return nil, fmt.Errorf("filename: %s, missing input", filename)
 	}
 
 	var runeList []rune

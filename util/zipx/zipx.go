@@ -2,11 +2,13 @@ package zipx
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
-	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 func Unpacking(name, destPath string, mapper func(f *zip.File) bool) error {
@@ -39,6 +41,12 @@ func fileCopy(file *zip.File, destPath string) error {
 		return err
 	}
 	defer rc.Close()
+
+	// Ensure the file path does not contain directory traversal elements
+	if strings.Contains(file.Name, "..") {
+		return fmt.Errorf("invalid file path: %s", file.Name)
+	}
+
 	abs, err := filepath.Abs(file.Name)
 	if err != nil {
 		return err

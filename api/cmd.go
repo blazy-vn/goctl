@@ -1,20 +1,22 @@
 package api
 
 import (
-	"github.com/blazy-vn/goctl/api/apigen"
-	"github.com/blazy-vn/goctl/api/dartgen"
-	"github.com/blazy-vn/goctl/api/docgen"
-	"github.com/blazy-vn/goctl/api/format"
-	"github.com/blazy-vn/goctl/api/gogen"
-	"github.com/blazy-vn/goctl/api/javagen"
-	"github.com/blazy-vn/goctl/api/ktgen"
-	"github.com/blazy-vn/goctl/api/new"
-	"github.com/blazy-vn/goctl/api/tsgen"
-	"github.com/blazy-vn/goctl/api/validate"
-	"github.com/blazy-vn/goctl/config"
-	"github.com/blazy-vn/goctl/internal/cobrax"
-	"github.com/blazy-vn/goctl/plugin"
 	"github.com/spf13/cobra"
+	"github.com/zeromicro/go-zero/tools/goctl/api/apigen"
+	"github.com/zeromicro/go-zero/tools/goctl/api/dartgen"
+	"github.com/zeromicro/go-zero/tools/goctl/api/docgen"
+	"github.com/zeromicro/go-zero/tools/goctl/api/format"
+	"github.com/zeromicro/go-zero/tools/goctl/api/gogen"
+	"github.com/zeromicro/go-zero/tools/goctl/api/javagen"
+	"github.com/zeromicro/go-zero/tools/goctl/api/ktgen"
+	"github.com/zeromicro/go-zero/tools/goctl/api/new"
+	"github.com/zeromicro/go-zero/tools/goctl/api/swagger"
+	"github.com/zeromicro/go-zero/tools/goctl/api/tsgen"
+	"github.com/zeromicro/go-zero/tools/goctl/api/validate"
+	"github.com/zeromicro/go-zero/tools/goctl/config"
+	"github.com/zeromicro/go-zero/tools/goctl/internal/cobrax"
+	"github.com/zeromicro/go-zero/tools/goctl/pkg/env"
+	"github.com/zeromicro/go-zero/tools/goctl/plugin"
 )
 
 var (
@@ -31,6 +33,7 @@ var (
 	ktCmd       = cobrax.NewCommand("kt", cobrax.WithRunE(ktgen.KtCommand))
 	pluginCmd   = cobrax.NewCommand("plugin", cobrax.WithRunE(plugin.PluginCommand))
 	tsCmd       = cobrax.NewCommand("ts", cobrax.WithRunE(tsgen.TsCommand))
+	swaggerCmd  = cobrax.NewCommand("swagger", cobrax.WithRunE(swagger.Command))
 )
 
 func init() {
@@ -46,6 +49,7 @@ func init() {
 		pluginCmdFlags   = pluginCmd.Flags()
 		tsCmdFlags       = tsCmd.Flags()
 		validateCmdFlags = validateCmd.Flags()
+		swaggerCmdFlags  = swaggerCmd.Flags()
 	)
 
 	apiCmdFlags.StringVar(&apigen.VarStringOutput, "o")
@@ -72,7 +76,7 @@ func init() {
 	goCmdFlags.StringVar(&gogen.VarStringHome, "home")
 	goCmdFlags.StringVar(&gogen.VarStringRemote, "remote")
 	goCmdFlags.StringVar(&gogen.VarStringBranch, "branch")
-	goCmdFlags.BoolVar(&gogen.VarBoolAuth, "auth")
+	goCmdFlags.BoolVar(&gogen.VarBoolWithTest, "test")
 	goCmdFlags.StringVarWithDefaultValue(&gogen.VarStringStyle, "style", config.DefaultFormat)
 
 	javaCmdFlags.StringVar(&javagen.VarStringDir, "dir")
@@ -97,8 +101,15 @@ func init() {
 	tsCmdFlags.StringVar(&tsgen.VarStringCaller, "caller")
 	tsCmdFlags.BoolVar(&tsgen.VarBoolUnWrap, "unwrap")
 
+	swaggerCmdFlags.StringVar(&swagger.VarStringAPI, "api")
+	swaggerCmdFlags.StringVar(&swagger.VarStringDir, "dir")
+	swaggerCmdFlags.BoolVar(&swagger.VarBoolYaml, "yaml")
+
 	validateCmdFlags.StringVar(&validate.VarStringAPI, "api")
 
 	// Add sub-commands
 	Cmd.AddCommand(dartCmd, docCmd, formatCmd, goCmd, javaCmd, ktCmd, newCmd, pluginCmd, tsCmd, validateCmd)
+	if env.UseExperimental() {
+		Cmd.AddCommand(swaggerCmd)
+	}
 }

@@ -1,6 +1,6 @@
 package ast
 
-import "github.com/blazy-vn/goctl/pkg/parser/api/token"
+import "github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
 
 // AtServerStmt represents @server statement.
 type AtServerStmt struct {
@@ -46,7 +46,8 @@ func (a *AtServerStmt) Format(prefix ...string) string {
 	w.Write(withNode(atServerNode, a.LParen), expectSameLine())
 	w.NewLine()
 	for _, v := range a.Values {
-		node := transferTokenNode(v.Key, withTokenNodePrefix(peekOne(prefix)+Indent), ignoreLeadingComment())
+		node := transferNilInfixNode([]*TokenNode{v.Key, v.Colon})
+		node = transferTokenNode(node, withTokenNodePrefix(peekOne(prefix)+Indent), ignoreLeadingComment())
 		w.Write(withNode(node, v.Value), expectIndentInfix(), expectSameLine())
 		w.NewLine()
 	}
@@ -148,7 +149,8 @@ func (a *AtDocGroupStmt) Format(prefix ...string) string {
 	w.Write(withNode(atDocNode, a.LParen), expectSameLine())
 	w.NewLine()
 	for _, v := range a.Values {
-		node := transferTokenNode(v.Key, withTokenNodePrefix(peekOne(prefix)+Indent), ignoreLeadingComment())
+		node := transferNilInfixNode([]*TokenNode{v.Key, v.Colon})
+		node = transferTokenNode(node, withTokenNodePrefix(peekOne(prefix)+Indent), ignoreLeadingComment())
 		w.Write(withNode(node, v.Value), expectIndentInfix(), expectSameLine())
 		w.NewLine()
 	}
@@ -575,3 +577,7 @@ func (e *BodyExpr) Pos() token.Position {
 }
 
 func (e *BodyExpr) exprNode() {}
+
+func (e *BodyExpr) IsArrayType() bool {
+	return e.LBrack != nil
+}

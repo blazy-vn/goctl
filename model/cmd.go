@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/blazy-vn/goctl/internal/cobrax"
-	"github.com/blazy-vn/goctl/model/mongo"
-	"github.com/blazy-vn/goctl/model/sql/command"
+	"github.com/zeromicro/go-zero/tools/goctl/internal/cobrax"
+	"github.com/zeromicro/go-zero/tools/goctl/model/mongo"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/command"
 )
 
 var (
@@ -71,6 +71,7 @@ func init() {
 	mysqlCmd.PersistentFlags().BoolVar(&command.VarBoolStrict, "strict")
 	mysqlCmd.PersistentFlags().StringSliceVarPWithDefaultValue(&command.VarStringSliceIgnoreColumns,
 		"ignore-columns", "i", []string{"create_at", "created_at", "create_time", "update_at", "updated_at", "update_time"})
+	mysqlCmd.PersistentFlags().StringVarPWithDefaultValue(&command.VarStringCachePrefix, "prefix", "p", "cache")
 
 	mysqlCmd.AddCommand(datasourceCmd, ddlCmd)
 	pgCmd.AddCommand(pgDatasourceCmd)

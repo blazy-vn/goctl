@@ -3,8 +3,8 @@ package tsgen
 import (
 	"testing"
 
-	"github.com/blazy-vn/goctl/api/spec"
 	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 )
 
 func TestGenTsType(t *testing.T) {
@@ -16,14 +16,14 @@ func TestGenTsType(t *testing.T) {
 		Docs:     nil,
 		IsInline: false,
 	}
-	ty, err := genTsType(member)
+	ty, err := genTsType(member, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.Equal(t, `'foo' | 'bar' | 'options' | '123'`, ty)
 
 	member.IsInline = true
-	ty, err = genTsType(member)
+	ty, err = genTsType(member, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,7 +31,7 @@ func TestGenTsType(t *testing.T) {
 
 	member.Type = spec.PrimitiveType{RawName: "int"}
 	member.Tag = `json:"foo,options=1|3|4|123"`
-	ty, err = genTsType(member)
+	ty, err = genTsType(member, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
