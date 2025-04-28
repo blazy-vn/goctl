@@ -315,12 +315,14 @@ func fromMysqlDataSource(arg dataSourceArg) error {
 
 		columnData, err := im.FindColumns(dsn.DBName, item)
 		if err != nil {
-			return err
+			log.Error("Failed to find columns for table %q: %v", item, err)
+			continue // Skip this table and continue with the next one
 		}
 
 		table, err := columnData.Convert()
 		if err != nil {
-			return err
+			log.Error("Failed to convert column data for table %q: %v", item, err)
+			continue // Skip this table and continue with the next one
 		}
 
 		matchTables[item] = table
@@ -366,12 +368,14 @@ func fromPostgreSqlDataSource(url string, pattern pattern, dir, schema string, c
 
 		columnData, err := im.FindColumns(schema, item)
 		if err != nil {
-			return err
+			log.Error("Failed to find columns for table %q: %v", item, err)
+			continue // Skip this table and continue with the next one
 		}
 
 		table, err := columnData.Convert()
 		if err != nil {
-			return err
+			log.Error("Failed to convert column data for table %q: %v", item, err)
+			continue // Skip this table and continue with the next one
 		}
 
 		matchTables[item] = table
