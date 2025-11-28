@@ -9,8 +9,9 @@ import (
 	"text/template"
 
 	"github.com/blazy-vn/goctl/api/spec"
-	util2 "github.com/blazy-vn/goctl/api/util"
+	apiutil "github.com/blazy-vn/goctl/api/util"
 	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/blazy-vn/goctl/util"
 	"github.com/blazy-vn/goctl/util/format"
 	"github.com/blazy-vn/goctl/util/pathx"
@@ -18,10 +19,20 @@ import (
 
 const defaultLogicPackage = "logic"
 
-//go:embed handler.tpl
-var handlerTemplate string
+var (
+	//go:embed handler.tpl
+	handlerTemplate string
+	//go:embed sse_handler.tpl
+	sseHandlerTemplate string
+	//go:embed auth.tpl
+	authTemplate string
+	//go:embed auth_implement.tpl
+	authImplementTemplate string
+	//go:embed auth_error.tpl
+	authErrorTemplate string
+)
 
-func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route spec.Route) error {
+func genHandler(dir, rootPkg, projectPkg string, cfg *config.Config, group spec.Group, route spec.Route) error {
 	handler := getHandlerName(route)
 	handlerPath := getHandlerFolderPath(group, route)
 	pkgName := handlerPath[strings.LastIndex(handlerPath, "/")+1:]
@@ -35,54 +46,62 @@ func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route
 		return err
 	}
 
+	var builtinTemplate = handlerTemplate
+	var templateFile = handlerTemplateFile
+	sse := group.GetAnnotation("sse")
+	if sse == "true" {
+		builtinTemplate = sseHandlerTemplate
+		templateFile = sseHandlerTemplateFile
+	}
+
 	return genFile(fileGenConfig{
 		dir:             dir,
 		subdir:          getHandlerFolderPath(group, route),
 		filename:        filename + ".go",
 		templateName:    "handlerTemplate",
 		category:        category,
-		templateFile:    handlerTemplateFile,
-		builtinTemplate: handlerTemplate,
+		templateFile:    templateFile,
+		builtinTemplate: builtinTemplate,
 		data: map[string]any{
 			"PkgName":        pkgName,
 			"ImportPackages": genHandlerImports(group, route, rootPkg),
 			"HandlerName":    handler,
 			"RequestType":    util.Title(route.RequestTypeName()),
+			"ResponseType":   responseGoTypeName(route, typesPacket),
 			"LogicName":      logicName,
-			"LogicType":      util.Title(getLogicName(route)),
-			"Call":           util.Title(strings.TrimSuffix(handler, "Handler")),
+			"LogicType":      strings.Title(getLogicName(route)),
+			"Call":           strings.Title(strings.TrimSuffix(handler, "Handler")),
 			"HasResp":        len(route.ResponseTypeName()) > 0,
 			"HasRequest":     len(route.RequestTypeName()) > 0,
 			"HasDoc":         len(route.JoinedDoc()) > 0,
 			"Doc":            getDoc(route.JoinedDoc()),
+			"projectPkg":     projectPkg,
+			"version":        version.BuildVersion,
 		},
 	})
 }
 
-func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
-	authPath := path.Join(dir, authDir)
-
+func genHandlers(dir, rootPkg, projectPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 	if VarBoolAuth {
-		if err := genAuthError(authPath, rootPkg, cfg, api); err != nil {
+		authPath := path.Join(dir, authDir)
+		if err := genAuthError(authPath, projectPkg, api); err != nil {
 			return err
 		}
-	}
-
-	if VarBoolAuth {
-		if err := genPolicyFile(path.Join(dir, "etc"), rootPkg, cfg, api); err != nil {
+		if err := genPolicyFile(path.Join(dir, "etc"), api); err != nil {
 			return err
 		}
 	}
 
 	for _, group := range api.Service.Groups {
 		if VarBoolAuth {
-			if err := genAuth(authPath, rootPkg, cfg, group); err != nil {
+			authPath := path.Join(dir, authDir)
+			if err := genAuth(authPath, projectPkg, group); err != nil {
 				return err
 			}
 		}
 
 		for _, route := range group.Routes {
-			if err := genHandler(dir, rootPkg, cfg, group, route); err != nil {
+			if err := genHandler(dir, rootPkg, projectPkg, cfg, group, route); err != nil {
 				return err
 			}
 		}
@@ -96,7 +115,8 @@ func genHandlerImports(group spec.Group, route spec.Route, parentPkg string) str
 		fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, getLogicFolderPath(group, route))),
 		fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)),
 	}
-	if len(route.RequestTypeName()) > 0 {
+	sse := group.GetAnnotation("sse")
+	if len(route.RequestTypeName()) > 0 || sse == "true" {
 		imports = append(imports, fmt.Sprintf("\"%s\"\n", pathx.JoinPackages(parentPkg, typesDir)))
 	}
 
@@ -145,7 +165,7 @@ func getLogicName(route spec.Route) string {
 	return handler + "Logic"
 }
 
-func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
+func genAuth(dir, projectPkg string, group spec.Group) error {
 	authName := group.GetAnnotation(groupProperty)
 	if len(authName) == 0 {
 		return nil
@@ -153,27 +173,21 @@ func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
 
 	authName = strings.TrimSuffix(authName, "s")
 	authFilename := fmt.Sprintf("%s.go", strings.ToLower(authName))
-	authName = util2.ToCamelCase(authName)
-
-	authPkg := fmt.Sprintf("%s/auth", rootPkg)
-
-	pkgParts := strings.Split(rootPkg, "/")
-	moduleName := pkgParts[0]
+	authName = apiutil.ToCamelCase(authName)
 
 	authImports := fmt.Sprintf(`"%s/common/bauth"
 	"%s/ent"
 	"context"
-	"github.com/zeromicro/go-zero/core/logx"`, moduleName, moduleName)
+	"github.com/zeromicro/go-zero/core/logx"`, projectPkg, projectPkg)
 
-	authMethods := make([]string, 0)
+	var authMethods []string
 	for _, route := range group.Routes {
 		handler := getHandlerName(route)
 		method := strings.TrimSuffix(handler, "Handler")
 		authMethods = append(authMethods, method)
 	}
 
-	authData := map[string]interface{}{
-		"AuthPackage":    authPkg,
+	authData := map[string]any{
 		"AuthName":       authName,
 		"AuthImports":    authImports,
 		"AuthMethods":    genAuthMethods(authName, authMethods),
@@ -191,12 +205,6 @@ func genAuth(dir, rootPkg string, cfg *config.Config, group spec.Group) error {
 	})
 }
 
-//go:embed auth.tpl
-var authTemplate string
-
-//go:embed auth_error.tpl
-var authErrorTemplate string
-
 func genAuthMethods(authName string, authActions []string) string {
 	var methods []string
 	for _, action := range authActions {
@@ -206,17 +214,14 @@ func genAuthMethods(authName string, authActions []string) string {
 	return strings.Join(methods, "\n\t")
 }
 
-//go:embed auth_implement.tpl
-var authImplementTemplate string
-
 func genAuthImplements(authName string, authActions []string) string {
 	var implements []string
 	for _, action := range authActions {
 		data := map[string]string{
 			"AuthName":      authName,
 			"Action":        util.Title(action),
-			"AuthNameLower": strings.ToLower(util2.ToSnakeCase(authName)),
-			"ActionLower":   strings.ToLower(util2.ToSnakeCase(action)),
+			"AuthNameLower": strings.ToLower(apiutil.ToSnakeCase(authName)),
+			"ActionLower":   strings.ToLower(apiutil.ToSnakeCase(action)),
 		}
 		var buf bytes.Buffer
 		err := template.Must(template.New("authImplement").Parse(authImplementTemplate)).Execute(&buf, data)
@@ -228,11 +233,8 @@ func genAuthImplements(authName string, authActions []string) string {
 	return strings.Join(implements, "\n\n")
 }
 
-func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
-	pkgParts := strings.Split(rootPkg, "/")
-	moduleName := pkgParts[0]
-
-	errImports := fmt.Sprintf(`"%s/common/berr"`, moduleName)
+func genAuthError(dir, projectPkg string, api *spec.ApiSpec) error {
+	errImports := fmt.Sprintf(`"%s/common/berr"`, projectPkg)
 
 	var errorVars []string
 	for i, group := range api.Service.Groups {
@@ -242,9 +244,9 @@ func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) er
 		}
 
 		authName = strings.TrimSuffix(authName, "s")
-		authName = util2.ToCamelCase(authName)
+		authName = apiutil.ToCamelCase(authName)
 
-		authMethods := make([]string, 0)
+		var authMethods []string
 		for _, route := range group.Routes {
 			handler := getHandlerName(route)
 			method := strings.TrimSuffix(handler, "Handler")
@@ -255,7 +257,11 @@ func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) er
 		errorVars = append(errorVars, genAuthErrorVars(authName, authMethods, baseErrCode))
 	}
 
-	authData := map[string]interface{}{
+	if len(errorVars) == 0 {
+		return nil
+	}
+
+	authData := map[string]any{
 		"ErrImports": errImports,
 		"ErrVars":    strings.Join(errorVars, "\n\n"),
 	}
@@ -265,7 +271,7 @@ func genAuthError(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) er
 		filename:        "error.go",
 		templateName:    "authErrorTemplate",
 		category:        category,
-		templateFile:    "", // Không cần thiết khi sử dụng embed
+		templateFile:    "",
 		builtinTemplate: authErrorTemplate,
 		data:            authData,
 	})
@@ -275,17 +281,17 @@ func genAuthErrorVars(authName string, authActions []string, baseErrCode int) st
 	var errorVars []string
 	for i, action := range authActions {
 		errCode := baseErrCode + i + 1
-		errName := fmt.Sprintf("Err%s%sDenied", authName, strings.Title(action))
+		errName := fmt.Sprintf("Err%s%sDenied", authName, util.Title(action))
 		errMsg := fmt.Sprintf("You do not have permission to perform this action: %s::%s",
-			strings.ToLower(util2.ToSnakeCase(authName)),
-			strings.ToLower(util2.ToSnakeCase(action)))
+			strings.ToLower(apiutil.ToSnakeCase(authName)),
+			strings.ToLower(apiutil.ToSnakeCase(action)))
 		errorVar := fmt.Sprintf("%s = berr.NewErrCodeMsg(%d, \"%s\")", errName, errCode, errMsg)
 		errorVars = append(errorVars, errorVar)
 	}
 	return strings.Join(errorVars, "\n\t")
 }
 
-func genPolicyFile(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
+func genPolicyFile(dir string, api *spec.ApiSpec) error {
 	var policyLines []string
 	for _, group := range api.Service.Groups {
 		authName := group.GetAnnotation(groupProperty)
@@ -293,20 +299,28 @@ func genPolicyFile(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) e
 			continue
 		}
 
-		authName = strings.ToLower(util2.ToSnakeCase(authName))
+		authName = strings.ToLower(apiutil.ToSnakeCase(authName))
 		policyLines = append(policyLines, fmt.Sprintf("p, %s_management, %s::*, true", authName, authName))
 
 		for _, route := range group.Routes {
 			handler := getHandlerName(route)
-			method := strings.ToLower(util2.ToSnakeCase(strings.TrimSuffix(handler, "Handler")))
+			method := strings.ToLower(apiutil.ToSnakeCase(strings.TrimSuffix(handler, "Handler")))
 			policyLines = append(policyLines, fmt.Sprintf("p, %s_%s, %s::%s, true", authName, method, authName, method))
 		}
 	}
 
+	if len(policyLines) == 0 {
+		return nil
+	}
+
 	policyData := strings.Join(policyLines, "\n")
 
-	fp, _, err := util2.MaybeCreateFile(dir, "", "auth_policy.csv")
+	fp, _, err := apiutil.MaybeCreateFile(dir, "", "auth_policy.csv")
+	if err != nil {
+		return err
+	}
 	if fp != nil {
+		defer fp.Close()
 		_, err = fp.WriteString(policyData)
 	}
 

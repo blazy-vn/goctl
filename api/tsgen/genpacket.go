@@ -32,24 +32,23 @@ func genHandler(dir, webAPI, caller string, api *spec.ApiSpec, unwrapAPI bool) e
 
 	imports := ""
 	if len(caller) == 0 {
-		caller = "service"
+		caller = "webapi"
 	}
 	importCaller := caller
 	if unwrapAPI {
 		importCaller = "{ " + importCaller + " }"
 	}
 	if len(webAPI) > 0 {
-		imports += `import ` + importCaller + ` from ` + `"./http"`
+		imports += `import ` + importCaller + ` from ` + `"./gocliRequest"`
 	}
 
 	if len(api.Types) != 0 {
 		if len(imports) > 0 {
 			imports += pathx.NL
 		}
-		//outputFile := apiutil.ComponentName(api)
-		//TODO hardcode
-		imports += fmt.Sprintf(`import * as types from "%s"`, "./"+"bcare-types-v2")
-		//imports += fmt.Sprintf(`%sexport * from "%s"`, pathx.NL, "./"+outputFile)
+		outputFile := apiutil.ComponentName(api)
+		imports += fmt.Sprintf(`import * as components from "%s"`, "./"+outputFile)
+		imports += fmt.Sprintf(`%sexport * from "%s"`, pathx.NL, "./"+outputFile)
 	}
 
 	apis, err := genAPI(api, caller)
@@ -73,13 +72,13 @@ func genAPI(api *spec.ApiSpec, caller string) (string, error) {
 				return "", fmt.Errorf("missing handler annotation for route %q", route.Path)
 			}
 
-			//handler = util.Untitle(handler)
+			handler = util.Untitle(handler)
 			handler = strings.Replace(handler, "Handler", "", 1)
 			comment := commentForRoute(route)
 			if len(comment) > 0 {
 				fmt.Fprintf(&builder, "%s\n", comment)
 			}
-			fmt.Fprintf(&builder, "export function %s(%s) {\n", group.GetAnnotation("group")+handler, paramsForRoute(route))
+			fmt.Fprintf(&builder, "export function %s(%s) {\n", handler, paramsForRoute(route))
 			writeIndent(&builder, 1)
 			responseGeneric := "<null>"
 			if len(route.ResponseTypeName()) > 0 {
@@ -88,7 +87,7 @@ func genAPI(api *spec.ApiSpec, caller string) (string, error) {
 					return "", err
 				}
 
-				responseGeneric = fmt.Sprintf("<types.GenericResponse<%s>>", val)
+				responseGeneric = fmt.Sprintf("<%s>", val)
 			}
 			fmt.Fprintf(&builder, `return %s.%s%s(%s)`, caller, strings.ToLower(route.Method),
 				util.Title(responseGeneric), callParamsForRoute(route, group))

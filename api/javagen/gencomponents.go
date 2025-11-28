@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"path"
+	"slices"
 	"strings"
 	"text/template"
 
@@ -16,7 +17,6 @@ import (
 	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/blazy-vn/goctl/util"
 	"github.com/blazy-vn/goctl/util/pathx"
-	"github.com/zeromicro/go-zero/core/stringx"
 )
 
 const (
@@ -96,13 +96,13 @@ func (c *componentsContext) createComponent(dir, packetName string, ty spec.Type
 	for _, item := range c.responseTypes {
 		if item.Name() == defineStruct.Name() {
 			superClassName = "HttpResponseData"
-			if !stringx.Contains(c.imports, httpResponseData) {
+			if !slices.Contains(c.imports, httpResponseData) {
 				c.imports = append(c.imports, httpResponseData)
 			}
 			break
 		}
 	}
-	if superClassName == "HttpData" && !stringx.Contains(c.imports, httpData) {
+	if superClassName == "HttpData" && !slices.Contains(c.imports, httpData) {
 		c.imports = append(c.imports, httpData)
 	}
 
@@ -266,7 +266,7 @@ func (c *componentsContext) genGetSet(writer io.Writer, indent int) error {
 		tyString := javaType
 		decorator := ""
 		javaPrimitiveType := []string{"int", "long", "boolean", "float", "double", "short"}
-		if !stringx.Contains(javaPrimitiveType, javaType) {
+		if !slices.Contains(javaPrimitiveType, javaType) {
 			if member.IsOptional() || member.IsOmitEmpty() {
 				decorator = "@Nullable "
 			} else {

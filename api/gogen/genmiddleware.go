@@ -6,6 +6,7 @@ import (
 
 	"github.com/blazy-vn/goctl/api/spec"
 	"github.com/blazy-vn/goctl/config"
+	"github.com/blazy-vn/goctl/internal/version"
 	"github.com/blazy-vn/goctl/util/format"
 )
 
@@ -31,7 +32,8 @@ func genMiddleware(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 			templateFile:    middlewareImplementCodeFile,
 			builtinTemplate: middlewareImplementCode,
 			data: map[string]string{
-				"name": strings.Title(name),
+				"name":    strings.Title(name),
+				"version": version.BuildVersion,
 			},
 		})
 		if err != nil {

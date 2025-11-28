@@ -3,10 +3,10 @@ package spec
 import (
 	"errors"
 	"path"
+	"slices"
 	"strings"
 
 	"github.com/blazy-vn/goctl/util"
-	"github.com/zeromicro/go-zero/core/stringx"
 )
 
 const (
@@ -20,11 +20,11 @@ const (
 var definedKeys = []string{bodyTagKey, formTagKey, pathTagKey, headerTagKey}
 
 func (s Service) JoinPrefix() Service {
-	var groups []Group
+	groups := make([]Group, 0, len(s.Groups))
 	for _, g := range s.Groups {
 		prefix := strings.TrimSpace(g.GetAnnotation(RoutePrefixKey))
 		prefix = strings.ReplaceAll(prefix, `"`, "")
-		var routes []Route
+		routes := make([]Route, 0, len(g.Routes))
 		for _, r := range g.Routes {
 			r.Path = path.Join("/", prefix, r.Path)
 			routes = append(routes, r)
@@ -57,14 +57,14 @@ func (m Member) Tags() []*Tag {
 
 // IsOptional returns true if tag is optional
 func (m Member) IsOptional() bool {
-	if !m.IsBodyMember() {
+	if !m.IsBodyMember() && !m.IsFormMember() {
 		return false
 	}
 
 	tag := m.Tags()
 	for _, item := range tag {
-		if item.Key == bodyTagKey {
-			if stringx.Contains(item.Options, "optional") {
+		if item.Key == bodyTagKey || item.Key == formTagKey {
+			if slices.Contains(item.Options, "optional") {
 				return true
 			}
 		}
@@ -81,7 +81,7 @@ func (m Member) IsOmitEmpty() bool {
 	tag := m.Tags()
 	for _, item := range tag {
 		if item.Key == bodyTagKey {
-			if stringx.Contains(item.Options, "omitempty") {
+			if slices.Contains(item.Options, "omitempty") {
 				return true
 			}
 		}
@@ -93,7 +93,7 @@ func (m Member) IsOmitEmpty() bool {
 func (m Member) GetPropertyName() (string, error) {
 	tags := m.Tags()
 	for _, tag := range tags {
-		if stringx.Contains(definedKeys, tag.Key) {
+		if slices.Contains(definedKeys, tag.Key) {
 			if tag.Name == "-" {
 				return util.Untitle(m.Name), nil
 			}
@@ -142,34 +142,16 @@ func (m Member) IsFormMember() bool {
 // IsTagMember returns true if contains given tag
 func (m Member) IsTagMember(tagKey string) bool {
 	if m.IsInline {
-		// Kiểm tra đệ quy các trường của struct inline
-		inlineType, ok := m.Type.(DefineStruct)
-		if ok {
-			for _, member := range inlineType.Members {
-				if member.IsTagMember(tagKey) {
-					return true
-				}
-			}
-		}
-		return false
+		return true
 	}
 
-	tags := m.parseTags()
-	_, exists := tags[tagKey]
-	return exists
-}
-
-func (m Member) parseTags() map[string]string {
-	tags := make(map[string]string)
-	for _, tag := range strings.Split(m.Tag, " ") {
-		parts := strings.SplitN(tag, ":", 2)
-		if len(parts) == 2 {
-			key := strings.Trim(parts[0], "`")
-			value := strings.Trim(parts[1], "\"`")
-			tags[key] = value
+	tags := m.Tags()
+	for _, tag := range tags {
+		if tag.Key == tagKey {
+			return true
 		}
 	}
-	return tags
+	return false
 }
 
 // GetEnumOptions return a slice contains all enumeration options

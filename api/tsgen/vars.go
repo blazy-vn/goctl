@@ -1,6 +1,6 @@
 package tsgen
 
 const (
-	packagePrefix = "types."
+	packagePrefix = "components."
 	pathPrefix    = "pathPrefix"
 )

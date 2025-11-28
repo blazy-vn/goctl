@@ -11,9 +11,9 @@ import (
 // upgrade gets the latest goctl by
 // go install github.com/blazy-vn/goctl@latest
 func upgrade(_ *cobra.Command, _ []string) error {
-	cmd := `GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go install github.com/blazy-vn/goctl@latest`
+	cmd := `go install github.com/blazy-vn/goctl@latest`
 	if runtime.GOOS == "windows" {
-		cmd = `set GOPROXY=https://goproxy.cn,direct && go install github.com/blazy-vn/goctl@latest`
+		cmd = `go install github.com/blazy-vn/goctl@latest`
 	}
 	info, err := execx.Run(cmd, "")
 	if err != nil {

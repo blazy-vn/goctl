@@ -1,6 +1,8 @@
 package api
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/blazy-vn/goctl/api/apigen"
 	"github.com/blazy-vn/goctl/api/dartgen"
 	"github.com/blazy-vn/goctl/api/docgen"
@@ -9,12 +11,12 @@ import (
 	"github.com/blazy-vn/goctl/api/javagen"
 	"github.com/blazy-vn/goctl/api/ktgen"
 	"github.com/blazy-vn/goctl/api/new"
+	"github.com/blazy-vn/goctl/api/swagger"
 	"github.com/blazy-vn/goctl/api/tsgen"
 	"github.com/blazy-vn/goctl/api/validate"
 	"github.com/blazy-vn/goctl/config"
 	"github.com/blazy-vn/goctl/internal/cobrax"
 	"github.com/blazy-vn/goctl/plugin"
-	"github.com/spf13/cobra"
 )
 
 var (
@@ -31,6 +33,7 @@ var (
 	ktCmd       = cobrax.NewCommand("kt", cobrax.WithRunE(ktgen.KtCommand))
 	pluginCmd   = cobrax.NewCommand("plugin", cobrax.WithRunE(plugin.PluginCommand))
 	tsCmd       = cobrax.NewCommand("ts", cobrax.WithRunE(tsgen.TsCommand))
+	swaggerCmd  = cobrax.NewCommand("swagger", cobrax.WithRunE(swagger.Command))
 )
 
 func init() {
@@ -46,6 +49,7 @@ func init() {
 		pluginCmdFlags   = pluginCmd.Flags()
 		tsCmdFlags       = tsCmd.Flags()
 		validateCmdFlags = validateCmd.Flags()
+		swaggerCmdFlags  = swaggerCmd.Flags()
 	)
 
 	apiCmdFlags.StringVar(&apigen.VarStringOutput, "o")
@@ -72,6 +76,8 @@ func init() {
 	goCmdFlags.StringVar(&gogen.VarStringHome, "home")
 	goCmdFlags.StringVar(&gogen.VarStringRemote, "remote")
 	goCmdFlags.StringVar(&gogen.VarStringBranch, "branch")
+	goCmdFlags.BoolVar(&gogen.VarBoolWithTest, "test")
+	goCmdFlags.BoolVar(&gogen.VarBoolTypeGroup, "type-group")
 	goCmdFlags.BoolVar(&gogen.VarBoolAuth, "auth")
 	goCmdFlags.StringVarWithDefaultValue(&gogen.VarStringStyle, "style", config.DefaultFormat)
 
@@ -85,6 +91,7 @@ func init() {
 	newCmdFlags.StringVar(&new.VarStringHome, "home")
 	newCmdFlags.StringVar(&new.VarStringRemote, "remote")
 	newCmdFlags.StringVar(&new.VarStringBranch, "branch")
+	newCmdFlags.StringVar(&new.VarStringModule, "module")
 	newCmdFlags.StringVarWithDefaultValue(&new.VarStringStyle, "style", config.DefaultFormat)
 
 	pluginCmdFlags.StringVarP(&plugin.VarStringPlugin, "plugin", "p")
@@ -97,8 +104,13 @@ func init() {
 	tsCmdFlags.StringVar(&tsgen.VarStringCaller, "caller")
 	tsCmdFlags.BoolVar(&tsgen.VarBoolUnWrap, "unwrap")
 
+	swaggerCmdFlags.StringVar(&swagger.VarStringAPI, "api")
+	swaggerCmdFlags.StringVar(&swagger.VarStringDir, "dir")
+	swaggerCmdFlags.StringVar(&swagger.VarStringFilename, "filename")
+	swaggerCmdFlags.BoolVar(&swagger.VarBoolYaml, "yaml")
+
 	validateCmdFlags.StringVar(&validate.VarStringAPI, "api")
 
 	// Add sub-commands
-	Cmd.AddCommand(dartCmd, docCmd, formatCmd, goCmd, javaCmd, ktCmd, newCmd, pluginCmd, tsCmd, validateCmd)
+	Cmd.AddCommand(dartCmd, docCmd, formatCmd, goCmd, javaCmd, ktCmd, newCmd, pluginCmd, tsCmd, validateCmd, swaggerCmd)
 }
