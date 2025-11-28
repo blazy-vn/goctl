@@ -1,6 +1,6 @@
 module github.com/blazy-vn/goctl
 
-go 1.21
+go 1.25.4
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
