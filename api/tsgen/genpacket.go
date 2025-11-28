@@ -11,6 +11,7 @@ import (
 	apiutil "github.com/blazy-vn/goctl/api/util"
 	"github.com/blazy-vn/goctl/util"
 	"github.com/blazy-vn/goctl/util/pathx"
+	"github.com/blazy-vn/goctl/util/stringx"
 )
 
 //go:embed handler.tpl
@@ -67,13 +68,10 @@ func genAPI(api *spec.ApiSpec, caller string) (string, error) {
 	var builder strings.Builder
 	for _, group := range api.Service.Groups {
 		for _, route := range group.Routes {
-			handler := route.Handler
-			if len(handler) == 0 {
-				return "", fmt.Errorf("missing handler annotation for route %q", route.Path)
+			handler, err := handlerNameForRoute(route, group)
+			if err != nil {
+				return "", err
 			}
-
-			handler = util.Untitle(handler)
-			handler = strings.Replace(handler, "Handler", "", 1)
 			comment := commentForRoute(route)
 			if len(comment) > 0 {
 				fmt.Fprintf(&builder, "%s\n", comment)
@@ -97,6 +95,59 @@ func genAPI(api *spec.ApiSpec, caller string) (string, error) {
 
 	apis := builder.String()
 	return apis, nil
+}
+
+func handlerNameForRoute(route spec.Route, group spec.Group) (string, error) {
+	if len(route.Handler) == 0 {
+		return "", fmt.Errorf("missing handler annotation for route %q", route.Path)
+	}
+
+	base := normalizeHandlerName(route.Handler)
+	if groupName := groupNameForRoute(group); len(groupName) > 0 {
+		base = groupName + util.Title(base)
+	}
+
+	return base, nil
+}
+
+func normalizeHandlerName(handler string) string {
+	name := util.Untitle(handler)
+	return strings.Replace(name, "Handler", "", 1)
+}
+
+func groupNameForRoute(group spec.Group) string {
+	name := group.GetAnnotation(groupProperty)
+	if len(name) == 0 {
+		return ""
+	}
+
+	name = strings.ReplaceAll(name, "-", "_")
+	name = stringx.From(name).ToCamel()
+	return util.Untitle(name)
+}
+
+func routePathName(route spec.Route, group spec.Group) string {
+	fullPath := strings.Trim(route.Path, "/")
+	if prefix := group.GetAnnotation(pathPrefix); len(prefix) > 0 {
+		prefix = strings.Trim(prefix, `"`)
+		fullPath = strings.Trim(strings.Trim(prefix, "/")+"/"+fullPath, "/")
+	}
+
+	if len(fullPath) == 0 {
+		return ""
+	}
+
+	parts := strings.FieldsFunc(fullPath, func(r rune) bool {
+		return r == '/' || r == '-'
+	})
+
+	for i, part := range parts {
+		part = strings.Trim(part, "{}")
+		part = strings.TrimPrefix(part, ":")
+		parts[i] = stringx.From(part).ToCamel()
+	}
+
+	return strings.Join(parts, "")
 }
 
 func paramsForRoute(route spec.Route) string {

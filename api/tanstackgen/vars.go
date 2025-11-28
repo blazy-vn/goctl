@@ -1,7 +1,7 @@
-package tsgen
+package tanstackgen
 
 const (
-	packagePrefix = "components."
+	packagePrefix = "types."
 	pathPrefix    = "pathPrefix"
 	groupProperty = "group"
 )

@@ -12,6 +12,7 @@ import (
 	"github.com/blazy-vn/goctl/api/ktgen"
 	"github.com/blazy-vn/goctl/api/new"
 	"github.com/blazy-vn/goctl/api/swagger"
+	"github.com/blazy-vn/goctl/api/tanstackgen"
 	"github.com/blazy-vn/goctl/api/tsgen"
 	"github.com/blazy-vn/goctl/api/validate"
 	"github.com/blazy-vn/goctl/config"
@@ -32,6 +33,7 @@ var (
 	javaCmd     = cobrax.NewCommand("java", cobrax.WithRunE(javagen.JavaCommand), cobrax.WithHidden())
 	ktCmd       = cobrax.NewCommand("kt", cobrax.WithRunE(ktgen.KtCommand))
 	pluginCmd   = cobrax.NewCommand("plugin", cobrax.WithRunE(plugin.PluginCommand))
+	tanstackCmd = cobrax.NewCommand("tanstack", cobrax.WithRunE(tanstackgen.TanstackCommand))
 	tsCmd       = cobrax.NewCommand("ts", cobrax.WithRunE(tsgen.TsCommand))
 	swaggerCmd  = cobrax.NewCommand("swagger", cobrax.WithRunE(swagger.Command))
 )
@@ -47,6 +49,7 @@ func init() {
 		ktCmdFlags       = ktCmd.Flags()
 		newCmdFlags      = newCmd.Flags()
 		pluginCmdFlags   = pluginCmd.Flags()
+		tanstackCmdFlag  = tanstackCmd.Flags()
 		tsCmdFlags       = tsCmd.Flags()
 		validateCmdFlags = validateCmd.Flags()
 		swaggerCmdFlags  = swaggerCmd.Flags()
@@ -99,6 +102,9 @@ func init() {
 	pluginCmdFlags.StringVar(&plugin.VarStringAPI, "api")
 	pluginCmdFlags.StringVar(&plugin.VarStringStyle, "style")
 
+	tanstackCmdFlag.StringVar(&tanstackgen.VarStringDir, "dir")
+	tanstackCmdFlag.StringVar(&tanstackgen.VarStringAPI, "api")
+
 	tsCmdFlags.StringVar(&tsgen.VarStringDir, "dir")
 	tsCmdFlags.StringVar(&tsgen.VarStringAPI, "api")
 	tsCmdFlags.StringVar(&tsgen.VarStringCaller, "caller")
@@ -112,5 +118,5 @@ func init() {
 	validateCmdFlags.StringVar(&validate.VarStringAPI, "api")
 
 	// Add sub-commands
-	Cmd.AddCommand(dartCmd, docCmd, formatCmd, goCmd, javaCmd, ktCmd, newCmd, pluginCmd, tsCmd, validateCmd, swaggerCmd)
+	Cmd.AddCommand(dartCmd, docCmd, formatCmd, goCmd, javaCmd, ktCmd, newCmd, pluginCmd, tanstackCmd, tsCmd, validateCmd, swaggerCmd)
 }
