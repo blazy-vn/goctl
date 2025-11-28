@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"path"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -18,20 +19,12 @@ import (
 var handlerTemplate string
 
 func genHandler(dir, webAPI, caller string, api *spec.ApiSpec, unwrapAPI bool) error {
-	filename := strings.Replace(api.Service.Name, "-api", "", 1) + ".ts"
-	if err := pathx.RemoveIfExist(path.Join(dir, filename)); err != nil {
-		return err
+	grouped := make(map[string][]spec.Group)
+	for _, group := range api.Service.Groups {
+		base := groupFileBase(api, group)
+		grouped[base] = append(grouped[base], group)
 	}
-	fp, created, err := apiutil.MaybeCreateFile(dir, "", filename)
-	if err != nil {
-		return err
-	}
-	if !created {
-		return nil
-	}
-	defer fp.Close()
 
-	imports := ""
 	if len(caller) == 0 {
 		caller = "webapi"
 	}
@@ -39,34 +32,60 @@ func genHandler(dir, webAPI, caller string, api *spec.ApiSpec, unwrapAPI bool) e
 	if unwrapAPI {
 		importCaller = "{ " + importCaller + " }"
 	}
-	if len(webAPI) > 0 {
-		imports += `import ` + importCaller + ` from ` + `"./gocliRequest"`
-	}
 
+	typeImports := ""
 	if len(api.Types) != 0 {
-		if len(imports) > 0 {
-			imports += pathx.NL
-		}
 		outputFile := apiutil.ComponentName(api)
-		imports += fmt.Sprintf(`import * as components from "%s"`, "./"+outputFile)
-		imports += fmt.Sprintf(`%sexport * from "%s"`, pathx.NL, "./"+outputFile)
+		typeImports = fmt.Sprintf(`%simport * as components from "%s"%sexport * from "%s"`, pathx.NL, "./"+outputFile, pathx.NL, "./"+outputFile)
 	}
 
-	apis, err := genAPI(api, caller)
-	if err != nil {
-		return err
+	var bases []string
+	for base := range grouped {
+		bases = append(bases, base)
+	}
+	sort.Strings(bases)
+
+	for _, base := range bases {
+		groups := grouped[base]
+		filename := base + ".ts"
+		if err := pathx.RemoveIfExist(path.Join(dir, filename)); err != nil {
+			return err
+		}
+		fp, created, err := apiutil.MaybeCreateFile(dir, "", filename)
+		if err != nil {
+			return err
+		}
+		if !created {
+			continue
+		}
+		defer fp.Close()
+
+		imports := ""
+		if len(webAPI) > 0 {
+			imports += `import ` + importCaller + ` from ` + `"./gocliRequest"`
+		}
+		imports += typeImports
+
+		apis, err := genAPI(groups, caller)
+		if err != nil {
+			return err
+		}
+
+		t := template.Must(template.New("handlerTemplate").Parse(handlerTemplate))
+		if err := t.Execute(fp, map[string]string{
+			"imports": imports,
+			"apis":    strings.TrimSpace(apis),
+		}); err != nil {
+			return err
+		}
 	}
 
-	t := template.Must(template.New("handlerTemplate").Parse(handlerTemplate))
-	return t.Execute(fp, map[string]string{
-		"imports": imports,
-		"apis":    strings.TrimSpace(apis),
-	})
+	return nil
 }
 
-func genAPI(api *spec.ApiSpec, caller string) (string, error) {
+func genAPI(groups []spec.Group, caller string) (string, error) {
 	var builder strings.Builder
-	for _, group := range api.Service.Groups {
+	for _, group := range groups {
 		for _, route := range group.Routes {
 			handler, err := handlerNameForRoute(route, group)
 			if err != nil {

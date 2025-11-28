@@ -31,9 +31,9 @@ func resolveDefineStruct(tp spec.Type) (spec.DefineStruct, bool) {
 	}
 }
 
-func writeProperty(writer io.Writer, member spec.Member, indent int) error {
+func writeProperty(writer io.Writer, member spec.Member, indent int, sharedTypes map[string]struct{}, inShared bool, needsShared *bool) error {
 	writeIndent(writer, indent)
-	ty, err := genTsType(member, indent)
+	ty, err := genTsType(member, indent, sharedTypes, inShared, needsShared)
 	if err != nil {
 		return err
 	}
@@ -70,16 +70,15 @@ func writeIndent(writer io.Writer, indent int) {
 	}
 }
 
-func genTsType(m spec.Member, indent int) (ty string, err error) {
-	v, ok := m.Type.(spec.NestedStruct)
-	if ok {
+func genTsType(m spec.Member, indent int, sharedTypes map[string]struct{}, inShared bool, needsShared *bool) (ty string, err error) {
+	if v, ok := m.Type.(spec.NestedStruct); ok {
 		writer := bytes.NewBuffer(nil)
 		_, err := fmt.Fprintf(writer, "{\n")
 		if err != nil {
 			return "", err
 		}
 
-		if err := writeMembers(writer, v, false, indent+1); err != nil {
+		if err := writeMembers(writer, v, false, indent+1, sharedTypes, inShared, needsShared); err != nil {
 			return "", err
 		}
 
@@ -91,7 +90,7 @@ func genTsType(m spec.Member, indent int) (ty string, err error) {
 		return writer.String(), nil
 	}
 
-	ty, err = goTypeToTs(m.Type, false)
+	ty, err = goTypeToTs(m.Type, false, sharedTypes, inShared, needsShared)
 	if enums := m.GetEnumOptions(); enums != nil {
 		if ty == "string" {
 			for i := range enums {
@@ -103,49 +102,53 @@ func genTsType(m spec.Member, indent int) (ty string, err error) {
 	return
 }
 
-func goTypeToTs(tp spec.Type, fromPacket bool) (string, error) {
+func goTypeToTs(tp spec.Type, fromPacket bool, sharedTypes map[string]struct{}, inShared bool, needsShared *bool) (string, error) {
 	switch v := tp.(type) {
 	case spec.DefineStruct:
-		return addPrefix(tp, fromPacket), nil
+		return addPrefix(tp, fromPacket, sharedTypes, inShared, needsShared), nil
 	case spec.PrimitiveType:
 		r, ok := primitiveType(tp.Name())
 		if !ok {
 			return "", errors.New("unsupported primitive type " + tp.Name())
 		}
-
 		return r, nil
 	case spec.MapType:
-		valueType, err := goTypeToTs(v.Value, fromPacket)
+		valueType, err := goTypeToTs(v.Value, fromPacket, sharedTypes, inShared, needsShared)
 		if err != nil {
 			return "", err
 		}
-
 		return fmt.Sprintf("{ [key: string]: %s }", valueType), nil
 	case spec.ArrayType:
 		if tp.Name() == "[]byte" {
 			return "Blob", nil
 		}
-
-		valueType, err := goTypeToTs(v.Value, fromPacket)
+		valueType, err := goTypeToTs(v.Value, fromPacket, sharedTypes, inShared, needsShared)
 		if err != nil {
 			return "", err
 		}
-
 		return fmt.Sprintf("Array<%s>", valueType), nil
 	case spec.InterfaceType:
 		return "any", nil
 	case spec.PointerType:
-		return goTypeToTs(v.Type, fromPacket)
+		return goTypeToTs(v.Type, fromPacket, sharedTypes, inShared, needsShared)
 	}
-
 	return "", errors.New("unsupported type " + tp.Name())
 }
 
-func addPrefix(tp spec.Type, fromPacket bool) string {
+func addPrefix(tp spec.Type, fromPacket bool, sharedTypes map[string]struct{}, inShared bool, needsShared *bool) string {
+	name := util.Title(tp.Name())
 	if fromPacket {
-		return packagePrefix + util.Title(tp.Name())
+		return packagePrefix + name
 	}
-	return util.Title(tp.Name())
+	if sharedTypes != nil {
+		if _, ok := sharedTypes[name]; ok && !inShared {
+			if needsShared != nil {
+				*needsShared = true
+			}
+			return "shared." + name
+		}
+	}
+	return name
 }
 
 func primitiveType(tp string) (string, bool) {
@@ -166,36 +169,34 @@ func primitiveType(tp string) (string, bool) {
 	return "", false
 }
 
-func writeType(writer io.Writer, tp spec.Type) error {
+func writeType(writer io.Writer, tp spec.Type, sharedTypes map[string]struct{}, inShared bool, needsShared *bool) error {
 	fmt.Fprintf(writer, "export interface %s {\n", util.Title(tp.Name()))
-	if err := writeMembers(writer, tp, false, 1); err != nil {
+	if err := writeMembers(writer, tp, false, 1, sharedTypes, inShared, needsShared); err != nil {
 		return err
 	}
-
 	fmt.Fprintf(writer, "}\n")
-	return genParamsTypesIfNeed(writer, tp)
+	return genParamsTypesIfNeed(writer, tp, sharedTypes, inShared, needsShared)
 }
 
-func genParamsTypesIfNeed(writer io.Writer, tp spec.Type) error {
+func genParamsTypesIfNeed(writer io.Writer, tp spec.Type, sharedTypes map[string]struct{}, inShared bool, needsShared *bool) error {
 	definedType, ok := tp.(spec.DefineStruct)
 	if !ok {
 		return errors.New("no members of type " + tp.Name())
 	}
-
 	members := definedType.GetNonBodyMembers()
 	if len(members) == 0 {
 		return nil
 	}
 
 	fmt.Fprintf(writer, "export interface %sParams {\n", util.Title(tp.Name()))
-	if err := writeTagMembers(writer, tp, formTagKey); err != nil {
+	if err := writeTagMembers(writer, tp, formTagKey, sharedTypes, inShared, needsShared); err != nil {
 		return err
 	}
 	fmt.Fprintf(writer, "}\n")
 
 	if len(definedType.GetTagMembers(headerTagKey)) > 0 {
 		fmt.Fprintf(writer, "export interface %sHeaders {\n", util.Title(tp.Name()))
-		if err := writeTagMembers(writer, tp, headerTagKey); err != nil {
+		if err := writeTagMembers(writer, tp, headerTagKey, sharedTypes, inShared, needsShared); err != nil {
 			return err
 		}
 		fmt.Fprintf(writer, "}\n")
@@ -204,14 +205,12 @@ func genParamsTypesIfNeed(writer io.Writer, tp spec.Type) error {
 	return nil
 }
 
-func writeMembers(writer io.Writer, tp spec.Type, isParam bool, indent int) error {
+func writeMembers(writer io.Writer, tp spec.Type, isParam bool, indent int, sharedTypes map[string]struct{}, inShared bool, needsShared *bool) error {
 	definedType, ok := tp.(spec.DefineStruct)
 	if !ok {
-		pointType, ok := tp.(spec.PointerType)
-		if ok {
-			return writeMembers(writer, pointType.Type, isParam, indent)
+		if pointType, ok := tp.(spec.PointerType); ok {
+			return writeMembers(writer, pointType.Type, isParam, indent, sharedTypes, inShared, needsShared)
 		}
-
 		return fmt.Errorf("type %s not supported", tp.Name())
 	}
 
@@ -221,44 +220,68 @@ func writeMembers(writer io.Writer, tp spec.Type, isParam bool, indent int) erro
 	}
 	for _, member := range members {
 		if member.IsInline {
-			if err := writeMembers(writer, member.Type, isParam, indent); err != nil {
+			if err := writeMembers(writer, member.Type, isParam, indent, sharedTypes, inShared, needsShared); err != nil {
 				return err
 			}
 			continue
 		}
 
-		if err := writeProperty(writer, member, indent); err != nil {
+		// Force shared imports when member is a shared struct
+		if memberTypeName := getStructName(member.Type); memberTypeName != "" {
+			if _, ok := sharedTypes[memberTypeName]; ok && !inShared && needsShared != nil {
+				*needsShared = true
+			}
+		}
+
+		if err := writeProperty(writer, member, indent, sharedTypes, inShared, needsShared); err != nil {
 			return apiutil.WrapErr(err, " type "+tp.Name())
 		}
 	}
 	return nil
 }
 
-func writeTagMembers(writer io.Writer, tp spec.Type, tagKey string) error {
+func writeTagMembers(writer io.Writer, tp spec.Type, tagKey string, sharedTypes map[string]struct{}, inShared bool, needsShared *bool) error {
 	definedType, ok := tp.(spec.DefineStruct)
 	if !ok {
-		pointType, ok := tp.(spec.PointerType)
-		if ok {
-			return writeTagMembers(writer, pointType.Type, tagKey)
+		if pointType, ok := tp.(spec.PointerType); ok {
+			return writeTagMembers(writer, pointType.Type, tagKey, sharedTypes, inShared, needsShared)
 		}
-
 		return fmt.Errorf("type %s not supported", tp.Name())
 	}
 
 	members := definedType.GetTagMembers(tagKey)
 	for _, member := range members {
 		if member.IsInline {
-			if err := writeTagMembers(writer, member.Type, tagKey); err != nil {
+			if err := writeTagMembers(writer, member.Type, tagKey, sharedTypes, inShared, needsShared); err != nil {
 				return err
 			}
 			continue
 		}
 
-		if err := writeProperty(writer, member, 1); err != nil {
+		if memberTypeName := getStructName(member.Type); memberTypeName != "" {
+			if _, ok := sharedTypes[memberTypeName]; ok && !inShared && needsShared != nil {
+				*needsShared = true
+			}
+		}
+
+		if err := writeProperty(writer, member, 1, sharedTypes, inShared, needsShared); err != nil {
 			return apiutil.WrapErr(err, " type "+tp.Name())
 		}
 	}
 	return nil
+}
+
+func getStructName(tp spec.Type) string {
+	switch v := tp.(type) {
+	case spec.DefineStruct:
+		return util.Title(v.Name())
+	case spec.PointerType:
+		return getStructName(v.Type)
+	case spec.ArrayType:
+		return getStructName(v.Value)
+	default:
+		return ""
+	}
 }
 
 func handlerNameForRoute(route spec.Route, group spec.Group) (string, error) {
@@ -338,7 +361,6 @@ func pathHasParams(route spec.Route) bool {
 	if !ok {
 		return false
 	}
-
 	return len(ds.Members) != len(ds.GetBodyMembers())
 }
 
@@ -347,7 +369,6 @@ func hasRequestBody(route spec.Route) bool {
 	if !ok {
 		return false
 	}
-
 	return len(route.RequestTypeName()) > 0 && len(ds.GetBodyMembers()) > 0
 }
 
@@ -356,7 +377,6 @@ func hasRequestPath(route spec.Route) bool {
 	if !ok {
 		return false
 	}
-
 	return len(route.RequestTypeName()) > 0 && len(ds.GetTagMembers(pathTagKey)) > 0
 }
 
@@ -365,7 +385,6 @@ func hasRequestHeader(route spec.Route) bool {
 	if !ok {
 		return false
 	}
-
 	return len(route.RequestTypeName()) > 0 && len(ds.GetTagMembers(headerTagKey)) > 0
 }
 
@@ -374,6 +393,5 @@ func hasRequestParams(route spec.Route) bool {
 	if !ok {
 		return false
 	}
-
 	return len(route.RequestTypeName()) > 0 && len(ds.GetFormMembers()) > 0
 }

@@ -5,6 +5,12 @@ import type {
   QueryKey,
   QueryOptions,
 } from '@tanstack/vue-query'
+import { QueryClient } from '@tanstack/vue-query'
+import { createCollection, type Collection, type CollectionConfig } from '@tanstack/db'
+import {
+  queryCollectionOptions,
+  type QueryCollectionUtils,
+} from '@tanstack/query-db-collection'
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS'
 
@@ -149,4 +155,137 @@ export function createMutationOptions<TResponse, TVariables>(
     mutationFn,
     ...(options ?? {}),
   }
+}
+
+export function createApiClient(defaultConfig: ClientConfig = {}) {
+  const baseConfig = { ...defaultConfig }
+
+  const boundRequest = <
+    TResponse,
+    TBody = unknown,
+    TParams = Record<string, unknown>,
+    THeaders = Record<string, unknown>,
+  >(
+    args: RequestArgs<TBody, TParams, THeaders>,
+    override?: ClientConfig,
+  ) => request<TResponse, TBody, TParams, THeaders>(args, mergeConfig(baseConfig, override))
+
+  return {
+    request: boundRequest,
+    withConfig: (override: ClientConfig) => createApiClient(mergeConfig(baseConfig, override)),
+  }
+}
+
+export const defaultApiClient = createApiClient()
+
+function mergeConfig(base: ClientConfig, override?: ClientConfig): ClientConfig {
+  if (!override) return base
+  return {
+    ...base,
+    ...override,
+    headers: {
+      ...(base.headers ?? {}),
+      ...(override.headers ?? {}),
+    },
+  }
+}
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      gcTime: 5 * 60 * 1000,
+      retry: 2,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+})
+
+export interface RequestCollectionConfig<
+  TItem extends object,
+  TResponse = Array<TItem>,
+  TKey extends string | number = string | number,
+  TBody = unknown,
+  TParams = Record<string, unknown>,
+  THeaders = Record<string, unknown>,
+> {
+  id?: string
+  queryKey: QueryKey
+  getKey: (item: TItem) => TKey
+  request:
+    | RequestArgs<TBody, TParams, THeaders>
+    | ((context: QueryFunctionContext<QueryKey>) => RequestArgs<TBody, TParams, THeaders>)
+  mapResponse?: (response: TResponse) => Array<TItem>
+  enabled?: boolean
+  staleTime?: number
+  gcTime?: number
+  retry?: number | false
+  refetchInterval?: number | false
+  meta?: Record<string, unknown>
+  clientConfig?: ClientConfig
+  collectionOptions?: Partial<
+    Pick<
+      CollectionConfig<TItem, TKey>,
+      'onInsert' | 'onUpdate' | 'onDelete' | 'stringCollation'
+    >
+  >
+  startSync?: boolean
+}
+
+export function createRequestCollection<
+  TItem extends object,
+  TResponse = Array<TItem>,
+  TKey extends string | number = string | number,
+  TBody = unknown,
+  TParams = Record<string, unknown>,
+  THeaders = Record<string, unknown>,
+>(
+  config: RequestCollectionConfig<TItem, TResponse, TKey, TBody, TParams, THeaders>,
+): Collection<TItem, TKey, QueryCollectionUtils<TItem, TKey, TItem, unknown>> {
+  const mapResponse =
+    config.mapResponse ??
+    ((response: TResponse) =>
+      Array.isArray(response) ? (response as Array<TItem>) : ([] as Array<TItem>))
+
+  const queryFn = async (context: QueryFunctionContext<QueryKey>) => {
+    const requestArgs =
+      typeof config.request === 'function'
+        ? config.request(context)
+        : config.request
+
+    const response = await defaultApiClient.request<TResponse, TBody, TParams, THeaders>(
+      {
+        ...requestArgs,
+        signal: context.signal,
+      },
+      config.clientConfig,
+    )
+
+    return mapResponse(response)
+  }
+
+  const collectionConfig = queryCollectionOptions({
+    id: config.id,
+    queryKey: config.queryKey,
+    queryFn,
+    queryClient,
+    getKey: config.getKey,
+    enabled: config.enabled ?? true,
+    staleTime: config.staleTime,
+    gcTime: config.gcTime,
+    retry: config.retry,
+    refetchInterval: config.refetchInterval,
+    meta: config.meta,
+    ...(config.collectionOptions ?? {}),
+  })
+
+  const collection = createCollection(collectionConfig)
+  if (config.startSync) {
+    void collection.preload()
+  }
+  return collection
 }

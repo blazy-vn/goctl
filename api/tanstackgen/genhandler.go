@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"path"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -31,42 +32,63 @@ type routeParts struct {
 }
 
 func genHandler(dir string, api *spec.ApiSpec) error {
-	filename := baseFileName(api) + ".ts"
-	if err := pathx.RemoveIfExist(path.Join(dir, filename)); err != nil {
-		return err
+	grouped := make(map[string][]spec.Group)
+	for _, group := range api.Service.Groups {
+		base := groupFileBase(api, group)
+		grouped[base] = append(grouped[base], group)
 	}
-	fp, created, err := apiutil.MaybeCreateFile(dir, "", filename)
-	if err != nil {
-		return err
-	}
-	if !created {
-		return nil
-	}
-	defer fp.Close()
 
-	imports := `import type { MutationOptions, QueryOptions } from "@tanstack/vue-query"`
-	imports += fmt.Sprintf(`%simport { createMutationOptions, createQueryOptions, request, type ClientConfig } from "./tanstackRequest"`, pathx.NL)
+	typeImports := ""
 	if len(api.Types) != 0 {
 		outputFile := strings.TrimSuffix(typesFileName(api), ".ts")
-		imports += fmt.Sprintf(`%simport * as types from "%s"`, pathx.NL, "./"+outputFile)
-		imports += fmt.Sprintf(`%sexport * from "%s"`, pathx.NL, "./"+outputFile)
+		typeImports = fmt.Sprintf(`%simport * as types from "%s"%sexport * from "%s"`, pathx.NL, "./"+outputFile, pathx.NL, "./"+outputFile)
 	}
 
-	apis, err := genAPI(api)
-	if err != nil {
-		return err
+	var bases []string
+	for base := range grouped {
+		bases = append(bases, base)
+	}
+	sort.Strings(bases)
+
+	for _, base := range bases {
+		groups := grouped[base]
+		filename := base + ".ts"
+		if err := pathx.RemoveIfExist(path.Join(dir, filename)); err != nil {
+			return err
+		}
+		fp, created, err := apiutil.MaybeCreateFile(dir, "", filename)
+		if err != nil {
+			return err
+		}
+		if !created {
+			continue
+		}
+		defer fp.Close()
+
+		imports := `import type { MutationOptions, QueryOptions } from "@tanstack/vue-query"`
+		imports += fmt.Sprintf(`%simport { createMutationOptions, createQueryOptions, request, type ClientConfig } from "./tanstackRequest"`, pathx.NL)
+		imports += typeImports
+
+		apis, err := genAPI(groups)
+		if err != nil {
+			return err
+		}
+
+		t := template.Must(template.New("handlerTemplate").Parse(handlerTemplate))
+		if err := t.Execute(fp, map[string]string{
+			"imports": imports,
+			"apis":    strings.TrimSpace(apis),
+		}); err != nil {
+			return err
+		}
 	}
 
-	t := template.Must(template.New("handlerTemplate").Parse(handlerTemplate))
-	return t.Execute(fp, map[string]string{
-		"imports": imports,
-		"apis":    strings.TrimSpace(apis),
-	})
+	return nil
 }
 
-func genAPI(api *spec.ApiSpec) (string, error) {
+func genAPI(groups []spec.Group) (string, error) {
 	var builder strings.Builder
-	for _, group := range api.Service.Groups {
+	for _, group := range groups {
 		for _, route := range group.Routes {
 			routeCode, err := buildRoute(route, group)
 			if err != nil {
@@ -88,7 +110,7 @@ func buildRoute(route spec.Route, group spec.Group) (string, error) {
 
 	responseType := "unknown"
 	if len(route.ResponseTypeName()) > 0 {
-		val, err := goTypeToTs(route.ResponseType, true)
+		val, err := goTypeToTs(route.ResponseType, true, nil, false, nil)
 		if err != nil {
 			return "", err
 		}
@@ -153,7 +175,7 @@ func buildRouteParts(route spec.Route) (routeParts, error) {
 	result.HasHeader = hasRequestHeader(route)
 
 	if result.HasBody {
-		bodyType, err := goTypeToTs(route.RequestType, true)
+		bodyType, err := goTypeToTs(route.RequestType, true, nil, false, nil)
 		if err != nil {
 			return result, err
 		}
@@ -161,7 +183,7 @@ func buildRouteParts(route spec.Route) (routeParts, error) {
 	}
 
 	if result.HasHeader {
-		headerType, err := goTypeToTs(route.RequestType, true)
+		headerType, err := goTypeToTs(route.RequestType, true, nil, false, nil)
 		if err != nil {
 			return result, err
 		}
@@ -188,7 +210,7 @@ func paramsTypeForRoute(ds spec.DefineStruct, route spec.Route) (string, bool, e
 
 	var formType string
 	if len(formMembers) > 0 {
-		val, err := goTypeToTs(route.RequestType, true)
+		val, err := goTypeToTs(route.RequestType, true, nil, false, nil)
 		if err != nil {
 			return "", false, err
 		}
@@ -223,7 +245,7 @@ func pathParamsType(members []spec.Member) (string, error) {
 		tags := member.Tags()
 		for _, tag := range tags {
 			if tag.Key == pathTagKey {
-				valueType, err := goTypeToTs(member.Type, false)
+				valueType, err := goTypeToTs(member.Type, false, nil, false, nil)
 				if err != nil {
 					return "", err
 				}

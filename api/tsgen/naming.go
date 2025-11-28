@@ -1,4 +1,4 @@
-package tanstackgen
+package tsgen
 
 import (
 	"strings"
@@ -14,10 +14,6 @@ func baseFileName(api *spec.ApiSpec) string {
 		return name[:len(name)-4]
 	}
 	return name
-}
-
-func typesFileName(api *spec.ApiSpec) string {
-	return baseFileName(api) + "-types.ts"
 }
 
 // groupFileBase returns a safe file base name for a group.

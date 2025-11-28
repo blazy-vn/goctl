@@ -8,8 +8,9 @@ import (
 )
 
 // BuildTypes generates the typescript code for the types.
-func BuildTypes(types []spec.Type) (string, error) {
+func BuildTypes(types []spec.Type, sharedTypes map[string]struct{}, inShared bool) (string, bool, error) {
 	var builder strings.Builder
+	var needsShared bool
 	first := true
 	for _, tp := range types {
 		if first {
@@ -17,10 +18,10 @@ func BuildTypes(types []spec.Type) (string, error) {
 		} else {
 			builder.WriteString("\n")
 		}
-		if err := writeType(&builder, tp); err != nil {
-			return "", apiutil.WrapErr(err, "Type "+tp.Name()+" generate error")
+		if err := writeType(&builder, tp, sharedTypes, inShared, &needsShared); err != nil {
+			return "", false, apiutil.WrapErr(err, "Type "+tp.Name()+" generate error")
 		}
 	}
 
-	return builder.String(), nil
+	return builder.String(), needsShared, nil
 }
