@@ -44,7 +44,7 @@ func genHandler(dir string, api *spec.ApiSpec) error {
 	}
 	defer fp.Close()
 
-	imports := `import type { MutationOptions, QueryOptions } from "@tanstack/query-core"`
+	imports := `import type { MutationOptions, QueryOptions } from "@tanstack/vue-query"`
 	imports += fmt.Sprintf(`%simport { createMutationOptions, createQueryOptions, request, type ClientConfig } from "./tanstackRequest"`, pathx.NL)
 	if len(api.Types) != 0 {
 		outputFile := strings.TrimSuffix(typesFileName(api), ".ts")
@@ -308,11 +308,9 @@ func buildMutationOptionsFunction(name, responseType string, parts routeParts, v
 	builder.WriteString(strings.Join(params, ", "))
 	builder.WriteString(fmt.Sprintf("): MutationOptions<%s, Error, %s> {\n", responseType, variablesType))
 	builder.WriteString(fmt.Sprintf("\treturn createMutationOptions<%s, %s>(\n", responseType, variablesType))
-	if parts.HasBody || parts.HasParams || parts.HasHeader {
-		builder.WriteString(fmt.Sprintf("\t\t(variables) => %s(variables, config),\n", name))
-	} else {
-		builder.WriteString(fmt.Sprintf("\t\t(_variables) => %s(config),\n", name))
-	}
+	// Always pass variables parameter, even for empty request types
+	// The function signature expects (variables, config?) not (config)
+	builder.WriteString(fmt.Sprintf("\t\t(variables) => %s(variables, config),\n", name))
 	builder.WriteString("\t\toptions,\n")
 	builder.WriteString("\t)\n")
 	builder.WriteString("}\n")

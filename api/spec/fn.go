@@ -142,7 +142,11 @@ func (m Member) IsFormMember() bool {
 // IsTagMember returns true if contains given tag
 func (m Member) IsTagMember(tagKey string) bool {
 	if m.IsInline {
-		return true
+		// Recursively check if embedded type has members with this tag
+		if ds, ok := m.Type.(DefineStruct); ok {
+			return len(ds.GetTagMembers(tagKey)) > 0
+		}
+		return false
 	}
 
 	tags := m.Tags()

@@ -4,7 +4,7 @@ import type {
   QueryFunctionContext,
   QueryKey,
   QueryOptions,
-} from '@tanstack/query-core'
+} from '@tanstack/vue-query'
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS'
 
@@ -85,9 +85,10 @@ async function parseError(response: Response): Promise<ApiError> {
     }
   }
 
+  // Type guard: after checking these conditions, TypeScript knows data is Record<string, unknown>
   const message =
-    typeof data === 'object' && data !== null && 'message' in (data as any)
-      ? String((data as any).message)
+    typeof data === 'object' && data !== null && 'message' in data
+      ? String(data.message)  // No type assertion needed - TypeScript infers this correctly
       : response.statusText
   return new ApiError(response.status, data, message)
 }
