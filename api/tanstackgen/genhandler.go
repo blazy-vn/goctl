@@ -128,7 +128,7 @@ func buildRoute(route spec.Route, group spec.Group) (string, error) {
 	builder.WriteString("\n")
 	builder.WriteString(buildQueryOptionsFunction(name, route, group, responseType, parts, variablesType))
 	builder.WriteString("\n")
-	builder.WriteString(buildMutationOptionsFunction(name, responseType, parts, variablesType))
+	builder.WriteString(buildMutationOptionsFunction(name, route, responseType, parts, variablesType))
 	builder.WriteString("\n")
 
 	return builder.String(), nil
@@ -298,7 +298,7 @@ func buildQueryOptionsFunction(name string, route spec.Route, group spec.Group, 
 	return builder.String()
 }
 
-func buildMutationOptionsFunction(name, responseType string, parts routeParts, variablesType string) string {
+func buildMutationOptionsFunction(name string, route spec.Route, responseType string, parts routeParts, variablesType string) string {
 	var builder strings.Builder
 	builder.WriteString(fmt.Sprintf("export function %sMutationOptions(", name))
 	params := []string{
@@ -308,9 +308,18 @@ func buildMutationOptionsFunction(name, responseType string, parts routeParts, v
 	builder.WriteString(strings.Join(params, ", "))
 	builder.WriteString(fmt.Sprintf("): MutationOptions<%s, Error, %s> {\n", responseType, variablesType))
 	builder.WriteString(fmt.Sprintf("\treturn createMutationOptions<%s, %s>(\n", responseType, variablesType))
-	// Always pass variables parameter, even for empty request types
-	// The function signature expects (variables, config?) not (config)
-	builder.WriteString(fmt.Sprintf("\t\t(variables) => %s(variables, config),\n", name))
+
+	// Check if request function has variables parameter
+	// If RequestTypeName is empty, the function signature is: function(config?)
+	// Otherwise, it's: function(variables, config?)
+	if len(route.RequestTypeName()) == 0 {
+		// Function has NO variables parameter, only config
+		builder.WriteString(fmt.Sprintf("\t\t(_variables) => %s(config),\n", name))
+	} else {
+		// Function HAS variables parameter
+		builder.WriteString(fmt.Sprintf("\t\t(variables) => %s(variables, config),\n", name))
+	}
+
 	builder.WriteString("\t\toptions,\n")
 	builder.WriteString("\t)\n")
 	builder.WriteString("}\n")

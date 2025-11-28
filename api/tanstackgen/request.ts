@@ -12,6 +12,7 @@ export interface ClientConfig {
   baseUrl?: string
   headers?: Record<string, string>
   fetcher?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+  signal?: AbortSignal
 }
 
 export interface RequestArgs<
